@@ -11,7 +11,7 @@
 
 ## Phase 0b（並行）：iOS 即時模式技術驗證（1 到 2 週）
 
-- 一個最小 Xcode 專案：Broadcast Upload Extension 加 PiP，不做任何產品 UI。
+- 一個最小 Xcode 專案：Broadcast Upload Extension 加 PiP，不做任何產品 UI。程式碼在 [ios-spike/](../ios-spike/README.md)，用 XcodeGen 產生專案。
 - 驗證五件事：擴充在 50 MB 內跑 Vision OCR 的穩定度；PiP 讓主 app 背景存活 10 分鐘以上；Translation framework 在背景能否翻；目標 app（Kakao Page、Naver Series、Piccoma、LINE Manga、Webtoon）錄影時是否黑掉；端到端延遲。
 - 結果決定 iOS 即時模式的產品形態（字幕、鏡像、或只能做部分 app）。清單見 [06-live-mode.md](06-live-mode.md) 第 5 節。
 

@@ -3,7 +3,7 @@
 目標：做一款像 EasyComix 那樣「在你原本的閱讀環境裡就地翻譯漫畫與小說」的產品，
 但採用沈浸式翻譯的鋪法：所有瀏覽器都能裝、手機上任何 app 內的內容都能翻。
 
-這個 repo 目前只有評估文件，尚未開始寫程式。
+目前內容：評估文件（docs/）與 iOS 即時模式技術驗證專案（ios-spike/，Phase 0b，尚未在 Xcode 編譯過）。
 
 ## 文件索引
 
@@ -16,6 +16,7 @@
 | [docs/05-novels.md](docs/05-novels.md) | 小說：三種來源的做法、token 計費的成本模型、小說專屬省錢手法 |
 | [docs/06-live-mode.md](docs/06-live-mode.md) | 即時模式（捲動自動更新）：Android 就地覆蓋與 iOS 廣播加 PiP 的完整設計、內容保護的限制、即時模式的成本控制、先做的技術驗證 |
 | [docs/references.md](docs/references.md) | 所有參考來源 |
+| [ios-spike/README.md](ios-spike/README.md) | iOS 即時模式技術驗證專案：廣播擴充加 PiP 的最小實作、五項驗證的操作步驟、結果記錄表 |
 
 ## 一頁結論
 

@@ -1,0 +1,80 @@
+# XcodeGen 專案描述。用法：
+#   brew install xcodegen
+#   cd ios-spike && xcodegen generate && open LiveSpike.xcodeproj
+#
+# 使用前要改三個地方，讓它們互相一致：
+#   1. 下面的 DEVELOPMENT_TEAM（你的 Apple Developer Team ID）
+#   2. 下面所有 com.example.livespike 與 group.com.example.livespike
+#   3. Shared/AppGroup.swift 裡的 AppGroup.id 與 broadcastExtensionBundleID
+#
+# App Group 需要在開發者帳號裡建立同名的 App Group，並讓兩個 bundle ID 都加入。
+# Xcode 的 Automatic signing 通常會幫你做，但第一次可能要在 Signing & Capabilities 手動勾一次。
+
+name: LiveSpike
+
+options:
+  bundleIdPrefix: com.example.livespike
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: XXXXXXXXXX
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    TARGETED_DEVICE_FAMILY: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+
+targets:
+  LiveSpike:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - Shared
+    dependencies:
+      - target: LiveSpikeBroadcast
+        embed: true
+    entitlements:
+      path: App/LiveSpike.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.example.livespike
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: LiveSpike
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIBackgroundModes:
+          - audio
+        NSMicrophoneUsageDescription: "不使用麥克風。此欄位只是為了避免系統廣播選擇器出現警告。"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.livespike
+
+  LiveSpikeBroadcast:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Broadcast
+      - Shared
+    entitlements:
+      path: Broadcast/LiveSpikeBroadcast.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.example.livespike
+    info:
+      path: Broadcast/Info.plist
+      properties:
+        CFBundleDisplayName: LiveSpike 擷取
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.broadcast-services-upload
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).SampleHandler
+          RPBroadcastProcessMode: RPBroadcastProcessModeSampleBuffer
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.livespike.Broadcast

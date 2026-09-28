@@ -1,0 +1,9 @@
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+build/
+App/Info.plist
+App/LiveSpike.entitlements
+Broadcast/Info.plist
+Broadcast/LiveSpikeBroadcast.entitlements
