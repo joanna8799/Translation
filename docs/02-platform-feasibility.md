@@ -83,7 +83,8 @@ iOS 不允許任何 app 畫在別的 app 上面，也不允許背景即時讀取
 
 - 技術上只需要：App Intent、Vision OCR、Translation framework、一個顯示結果的畫面。沒有任何 iOS 限制要繞，審核也沒風險。
 - 體驗上是「每一頁按一下」，不是即時，但動作按鈕與背面輕點讓它接近無縫，使用者看起來就是「在別人的 app 上翻譯」。
-- 翻好的頁面是完整畫回氣泡的，不是字幕條。
+- EasyComix 的描述原文是「translate any comic screenshot from inside your reading app」，證實這是截圖式，不是即時覆蓋；在他的 Pro 清單裡列為「system-wide iOS Shortcuts access」，所以是付費功能。
+- 翻好的頁面推論是完整畫回氣泡的（app 整體如此宣稱），但結果是覆蓋在原 app 上還是跳進 EasyComix 顯示，沒看到影片無法確認。兩種都做得到，前者用捷徑的 Quick Look，後者用 App Intent 開啟 app。
 - 這是我們在 iOS 上做「任何 app 內」的第一優先。它不是折衷，是 iOS 上唯一穩定又容易的正解。
 
 ### 3b. ReplayKit 廣播擷取加子母畫面字幕（EasyComix 的「Live Captions」，Pro 限定，最難）

@@ -13,8 +13,26 @@
 - 亮點：漫畫專用 OCR（針對漫畫字型、直式日文、狀聲詞訓練，每種文字各一個辨識器）、Live Translation 邊捲邊翻、Live Captions 在其他 app 上方顯示翻譯、iOS 捷徑。
 - 三種使用模式（越南文版 App Store 描述）：
   1. 跨 app 截圖捷徑，主打、影片示範的用法：在任何 app 看漫畫時用背面輕點、動作按鈕、AssistiveTouch 或 Siri 觸發，截圖交給 EasyComix，偵測氣泡、辨識、翻譯，翻好的整頁顯示出來。
-  2. 自家閱讀器：貼漫畫網址、匯入 PDF 或 CBZ、從相簿選圖。Live Translation「捲到哪翻到哪」是這個模式。
-  3. Live Captions（Pro）：在其他 app 上方的浮動字幕條，邊捲邊翻。
+  2. 自家閱讀器：貼漫畫網址、匯入 PDF 或 CBZ、從相簿選圖。有兩種翻法：Classic 先把整章翻完再看（上下文與一致性較好），Live Translation 捲到哪翻到哪。
+  3. Live Captions（Pro）：在其他 app 上方的浮動字幕條，邊捲邊翻。官方說明：「在你的裝置上讀取螢幕，只有文字會送出去翻譯」。
+
+## 1.1 證據等級：哪些是證實的、哪些是推論
+
+| 說法 | 等級 | 依據 |
+|---|---|---|
+| 有貼網址／匯入檔案的自家閱讀器，分 Classic 與 Live Translation 兩種翻法 | 證實 | App Store 描述片段：「Live Translation translates pages as you scroll… Classic Translation translates the whole chapter first」 |
+| 可在其他 app 內用動作按鈕、背面輕點、AssistiveTouch 或 Siri 觸發，翻譯「截圖」 | 證實 | App Store 描述片段：「set a system-wide trigger using Action Button, Back Tap, AssistiveTouch, or Siri to translate any comic screenshot from inside your reading app」 |
+| 這個截圖捷徑是 Pro 功能 | 大致證實 | Pro 功能清單列有「system-wide iOS Shortcuts access」 |
+| Live Captions 在裝置上讀螢幕、只送文字、顯示為字幕 | 證實 | App Store 描述片段：「reading your screen on your device and only the text goes out… shown as captions on screen」 |
+| OCR 在端側、雲端只收文字（成本控制的核心） | 證實（至少 Live Captions 是） | 同上 |
+| 免費離線無限、AI 每日 10 次需登入、無廣告、週月年訂閱 | 證實 | 多個 App Store 摘要一致 |
+| 離線翻譯用 Apple Translation framework | 推論 | 27 語與 Apple 翻譯語言清單重合；iOS 17.4 起開放 |
+| 截圖捷徑翻好的頁面是「畫回氣泡」而不是字幕 | 推論 | 描述說 app 整體「renders translated text directly into speech bubbles」，但沒有針對捷徑模式單獨說明 |
+| 截圖結果顯示方式（Quick Look 覆蓋在原 app 上，還是跳進 EasyComix） | 未證實 | 沒看到影片與截圖 |
+| Live Captions 的實作是 ReplayKit 廣播擷取加子母畫面 | 推論 | 這是 iOS 上唯一能在背景讀螢幕又能顯示東西的公開 API 組合 |
+| 有跨使用者翻譯快取、用哪家 LLM | 未知 | 沒有公開資訊 |
+
+Threads 影片與 App Store 截圖本環境都無法讀取，以上依據全部來自搜尋引擎回傳的描述片段。
 
 ## 2. 功能分層：免費 vs Pro
 
@@ -56,6 +74,8 @@
 - 送圖片：一張圖光是 image token 就 260 到 1,600 不等，還必須用有視覺能力的模型，更貴更慢。
 
 這一步把每頁成本壓低一個數量級，同時避免把有版權的圖片上傳到第三方 API，隱私與法律風險都降低。
+
+這點有直接證據：Live Captions 的官方說明是「在你的裝置上讀取螢幕，只有文字會送出去翻譯，文字不保存、不用來訓練模型」。
 
 ### 3.4 逐頁翻，不整章翻
 
