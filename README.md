@@ -27,19 +27,20 @@
 5. 週／月／年訂閱把 LLM 支出變成可預測的收入；週訂抓「追完就走」的人。
 6. 只要功能會花伺服器錢或很難做，就放進 Pro；免費層只放邊際成本為零的東西。
 
-**EasyComix 只做 iOS，為什麼文件說 iOS 最難**
+**EasyComix 怎麼在 iOS 上做到「在別人的 app 上翻譯」**
 
-這是兩件事。EasyComix 的主體是「自家 app 內的閱讀器」，這在 iOS 上是最容易的：Apple 免費提供端側 OCR 與端側翻譯，機型單純，使用者願意付費。
-難的是「在別的 app 裡面翻」：iOS 不允許任何 app 畫在其他 app 上面，EasyComix 的 Live Captions（背景錄影加子母畫面字幕條）和截圖捷徑都是折衷，不是就地換氣泡。
-Android 剛好相反，跨 app 覆蓋很直接。要走 EasyComix 的路就 iOS 自家閱讀器先做；「任何 app 內」是核心賣點就 Android 先做。
+他主打的模式是截圖加捷徑：在任何 app 看漫畫時用背面輕點、動作按鈕、AssistiveTouch 或 Siri 觸發，iOS 截圖交給 EasyComix，端側偵測氣泡、OCR、翻譯、畫回氣泡，翻好的整頁顯示在原 app 上方，滑掉繼續看下一頁。
+這條路在 iOS 上容易做、沒有審核風險，是 iOS 上「任何 app 內」的正解，只是每頁要按一下。
+另外他有自家閱讀器（貼網址、匯入 PDF/CBZ、相簿選圖）和 Pro 限定的 Live Captions（背景錄影加子母畫面字幕條，即時但只能顯示字幕）。
+iOS 與 Android 真正的差別只有一個：Android 可以做即時懸浮覆蓋，iOS 要每頁按一下。
 
 **「全平台」實際做得到的範圍**
 
 | 你要的 | 能做到的 |
 |---|---|
 | 所有瀏覽器 | 可以。一份 WebExtension 出 Chrome、Edge、Firefox、Safari 桌面版，再包成 iOS Safari 擴充。網頁小說在這一層幾乎是免費附送。 |
-| 手機任何 app 內 | Android 可以，漫畫用螢幕擷取 + 懸浮窗，小說多一條 AccessibilityService 直接讀文字的路。iOS 只能用「截圖捷徑」或「子母畫面字幕條」折衷。 |
-| 就地把氣泡換成中文 | 瀏覽器可以、Android 可以、iOS 只在自家 app 內可以。 |
+| 手機任何 app 內 | Android 可以即時，漫畫用螢幕擷取 + 懸浮窗，小說多一條 AccessibilityService 直接讀文字的路。iOS 用截圖捷徑，每頁按一下，這是 EasyComix 主打的做法。 |
+| 就地把氣泡換成中文 | 瀏覽器可以、Android 可以、iOS 截圖捷徑與自家閱讀器都可以，只是不是即時。 |
 
 **建議架構的一句話**：看得到內容的地方做辨識，雲端只收文字，免費層不碰雲端。
 

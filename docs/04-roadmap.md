@@ -34,9 +34,9 @@
 
 ## Phase 4：iOS（4 到 6 週）
 
-- 順序：app 內閱讀器（含貼網址追更小說、匯入 EPUB），分享與捷徑，Safari 擴充，最後才是 PiP Live Captions。
+- 順序：截圖捷徑跨 app 翻譯（EasyComix 主打模式，最容易）與 app 內閱讀器（貼網址追更小說、匯入 EPUB 與 CBZ）一起做，兩者共用同一套辨識與排版程式碼；再 Safari 擴充；PiP Live Captions 最後，甚至可以不做。
 - Vision OCR 與 Apple Translation framework 當 L0。
-- 如果決定走 EasyComix 的路，這個階段可以提前到 Phase 1 之後。
+- 如果決定走 EasyComix 的路，這個階段可以提前到 Phase 0 之後，因為截圖捷徑不需要瀏覽器擴充的任何東西。
 
 ## Phase 5：Pro 訂閱與營運
 

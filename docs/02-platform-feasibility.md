@@ -75,13 +75,18 @@ content script 的 canvas 讀不到跨網域圖片的像素（tainted canvas）�
 
 ## 3. iOS「任何 app 內」（C）
 
-iOS 不允許任何 app 畫在別的 app 上面，也不允許背景即時讀取別的 app 畫面。所以「在原本的 app 裡把氣泡就地換成中文」在 iOS 上做不到，EasyComix 也做不到，他用兩個折衷。
+iOS 不允許任何 app 畫在別的 app 上面，也不允許背景即時讀取別的 app 畫面。所以「即時覆蓋」在 iOS 上做不到。但 EasyComix 證明了「截圖加捷徑」這條路可以做出接近無縫的跨 app 體驗，而且這正是他主打、影片裡示範的用法。
 
-### 3a. 系統捷徑或分享至 app（EasyComix 的「system-wide iOS Shortcut」）
+### 3a. 截圖加捷徑（EasyComix 主打的跨 app 模式，容易做）
 
-使用者截圖，捷徑或分享表單把圖丟給我們的 app，app 短暫跳到前景顯示翻譯好的整頁，再返回。體驗是兩步，但簡單穩定，任何 app 都適用，也不會有審核風險。
+流程：使用者在 Kakao Webtoon、Piccoma 或任何 app 裡看漫畫，用背面輕點兩下、動作按鈕、AssistiveTouch 或 Siri 觸發捷徑。iOS 截圖，捷徑透過 App Intent 把圖交給我們的 app。app 在端側做氣泡偵測、OCR、翻譯、畫回氣泡，用 Quick Look 或跳到前景把翻好的整頁顯示在原 app 上方。使用者滑掉，繼續捲下一頁，再觸發一次。
 
-### 3b. ReplayKit 廣播擷取加子母畫面字幕（EasyComix 的「Live Captions」）
+- 技術上只需要：App Intent、Vision OCR、Translation framework、一個顯示結果的畫面。沒有任何 iOS 限制要繞，審核也沒風險。
+- 體驗上是「每一頁按一下」，不是即時，但動作按鈕與背面輕點讓它接近無縫，使用者看起來就是「在別人的 app 上翻譯」。
+- 翻好的頁面是完整畫回氣泡的，不是字幕條。
+- 這是我們在 iOS 上做「任何 app 內」的第一優先。它不是折衷，是 iOS 上唯一穩定又容易的正解。
+
+### 3b. ReplayKit 廣播擷取加子母畫面字幕（EasyComix 的「Live Captions」，Pro 限定，最難）
 
 - Broadcast Upload Extension 可以在背景擷取整個螢幕，這是系統錄影與直播用的機制。
 - 擴充程序只有 50 MB 記憶體上限，超過就被殺。所以只能跑很小的 OCR，或用系統的 Vision framework（`VNRecognizeTextRequest`，支援中、日、韓，但直式文字支援仍不穩，需要實測）。
@@ -95,34 +100,36 @@ iOS 不允許任何 app 畫在別的 app 上面，也不允許背景即時讀取
 
 ### 3d. App 內閱讀器
 
-匯入圖片、CBZ、貼網址，在自己的 app 裡看。這是唯一能在 iOS 上做到「畫回氣泡」的方式，EasyComix 的主體也是這個。OCR 用 Vision framework，翻譯用 Apple Translation framework，兩者都免費、離線。
+貼漫畫網址、匯入 PDF 或 CBZ、從相簿選圖，在自己的 app 裡看。EasyComix 也有這個模式，Live Translation「捲到哪翻到哪」就是在這裡。OCR 用 Vision framework，翻譯用 Apple Translation framework，兩者都免費、離線。跟 3a 共用同一套辨識與排版程式碼，差別只在圖片來源。
 
 ## 4. 「全平台」的實際定義
 
 | 你要的 | 能給的 |
 |---|---|
 | 所有瀏覽器 | 一份 WebExtension 出 Chrome、Edge、Firefox、Safari 桌面版，加 iOS Safari，加 Android 第三方瀏覽器 |
-| 手機任何 app 內 | Android 真正的懸浮覆蓋；iOS 用截圖捷徑（穩）加 PiP 字幕條（難） |
-| 就地畫回氣泡 | 瀏覽器可以、Android 可以、iOS 只在自家 app 內可以 |
+| 手機任何 app 內 | Android：即時懸浮覆蓋。iOS：截圖捷徑，每頁按一下（EasyComix 主打，容易）；PiP 字幕條才是即時的，但難做 |
+| 就地畫回氣泡 | 瀏覽器可以、Android 可以、iOS 截圖捷徑與自家閱讀器都可以，只是 iOS 不是即時的 |
 
-先接受這個差異，再決定要不要投資 iOS 的 PiP 字幕。
+iOS 與 Android 真正的差別只有一個：Android 可以「即時」，iOS 要「每頁按一下」。
 
-## 5. 為什麼 EasyComix 只做 iOS，這裡卻說 iOS 最難
+## 5. EasyComix 只做 iOS，那 iOS 到底難不難
 
-兩件事要分開看。
+修正先前的說法。EasyComix 主打的用法確實是「在別人的 app 上翻譯」，做法是截圖加捷徑，而這條路在 iOS 上很容易做。難的只有「即時覆蓋」，EasyComix 也只用 Pro 限定的浮動字幕條部分做到。
 
-| | iOS | Android |
+| 模式 | iOS | Android |
 |---|---|---|
-| 自家 app 內閱讀器（匯入、貼網址） | 最容易。Vision OCR 與 Translation framework 免費、端側、品質穩；機型單純；使用者付費意願高 | 容易。ML Kit 同樣免費端側 |
-| 在別的 app 裡就地翻 | 做不到真正的覆蓋。只能截圖捷徑，或背景錄影加子母畫面字幕條 | 直接做得到。螢幕擷取加懸浮窗 |
-| 小說：讀其他 app 的文字 | 做不到，只能截圖 | AccessibilityService 可直接讀 UI 樹的文字，不用 OCR |
+| 自家閱讀器（貼網址、匯入檔案） | 容易。Vision OCR 與 Translation framework 免費、端側 | 容易。ML Kit 同樣免費端側 |
+| 跨 app，每頁按一下（截圖捷徑） | 容易，EasyComix 主打。背面輕點、動作按鈕、Siri 觸發，翻好的整頁顯示在原 app 上方 | 容易，但 Android 通常直接做即時的 |
+| 跨 app，即時覆蓋 | 難。只能背景錄影加 PiP 字幕條，記憶體 50 MB，審核風險 | 容易。螢幕擷取加懸浮窗 |
+| 小說：讀其他 app 的文字 | 截圖後 OCR | AccessibilityService 直接讀 UI 樹的文字，不用 OCR |
 
-EasyComix 的主體是第一列，所以他選 iOS 先上完全合理；他的 Live Captions 是第二列的折衷版，也是他 app 裡最難、鎖在 Pro 的功能。
+EasyComix 做的是第一列加第二列，第三列只做了字幕條版。他選 iOS 先上的理由：Apple 免費送端側 OCR 與翻譯、機型單純、使用者付費意願高，而且截圖捷徑在 iOS 上的觸發方式（動作按鈕、背面輕點）比 Android 順手。
 
-你的需求「任何 app 內」是第二列。這一列 Android 容易、iOS 難。所以：
+對我們的意義：
 
-- 想走 EasyComix 的路：iOS 自家閱讀器先做，跨 app 用截圖捷徑補。
-- 「任何 app 內」是核心賣點：Android 先做，iOS 用自家閱讀器加截圖捷徑跟上。
+- iOS 的「任何 app 內」用截圖捷徑做，成本低、風險低，可以跟自家閱讀器一起在早期做完。
+- Android 額外多了「即時」，這是 EasyComix 沒有的差異化。
+- PiP 字幕條放最後，甚至可以不做。
 
 ## 6. 小說在 Android 多一條路：AccessibilityService
 
