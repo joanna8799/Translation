@@ -16,7 +16,8 @@
 - OCR：先雲端（重用 Phase 0），量測每頁延遲與成本。
 - 翻譯：Chrome Translator API 當 L0，雲端 LLM 當 L1。
 - 覆蓋層：絕對定位方塊版。
-- 帳號、每日額度、共享快取上線。
+- 網頁小說：找正文容器、逐段翻、雙語對照。文字翻譯比漫畫簡單，在這一階段順便做。
+- 帳號、token 額度、共享快取上線。
 
 ## Phase 2：端側 OCR 搬進瀏覽器（2 到 3 週）
 
@@ -28,17 +29,20 @@
 - 參考 overlay-translator 與 MangaLens 的架構，兩者都可商用。
 - MediaProjection、前景服務、懸浮窗；ML Kit OCR 與 ML Kit 翻譯當 L0。
 - 氣泡偵測先用像素法，再視需要加 TFLite 模型。
+- 小說：AccessibilityService 讀文字節點，讀不到退到 OCR；整頁翻譯面板。
 - 共用同一個雲端 LLM proxy 與帳號系統。
 
 ## Phase 4：iOS（4 到 6 週）
 
-- 順序：app 內閱讀器，分享與捷徑，Safari 擴充，最後才是 PiP Live Captions。
+- 順序：app 內閱讀器（含貼網址追更小說、匯入 EPUB），分享與捷徑，Safari 擴充，最後才是 PiP Live Captions。
 - Vision OCR 與 Apple Translation framework 當 L0。
+- 如果決定走 EasyComix 的路，這個階段可以提前到 Phase 1 之後。
 
 ## Phase 5：Pro 訂閱與營運
 
 - RevenueCat 串 App Store、Play、Stripe（擴充版用 Stripe 或授權碼）。
-- Pro 上限、降級、BYOK。
+- Pro token 額度、高品質模式加倍扣額、降級、BYOK。
+- 整本預翻走 Batch API。
 - 用量與成本儀表板：每日 LLM 花費、快取命中率、每用戶頁數。
 
 ## 風險

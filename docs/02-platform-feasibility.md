@@ -106,3 +106,30 @@ iOS 不允許任何 app 畫在別的 app 上面，也不允許背景即時讀取
 | 就地畫回氣泡 | 瀏覽器可以、Android 可以、iOS 只在自家 app 內可以 |
 
 先接受這個差異，再決定要不要投資 iOS 的 PiP 字幕。
+
+## 5. 為什麼 EasyComix 只做 iOS，這裡卻說 iOS 最難
+
+兩件事要分開看。
+
+| | iOS | Android |
+|---|---|---|
+| 自家 app 內閱讀器（匯入、貼網址） | 最容易。Vision OCR 與 Translation framework 免費、端側、品質穩；機型單純；使用者付費意願高 | 容易。ML Kit 同樣免費端側 |
+| 在別的 app 裡就地翻 | 做不到真正的覆蓋。只能截圖捷徑，或背景錄影加子母畫面字幕條 | 直接做得到。螢幕擷取加懸浮窗 |
+| 小說：讀其他 app 的文字 | 做不到，只能截圖 | AccessibilityService 可直接讀 UI 樹的文字，不用 OCR |
+
+EasyComix 的主體是第一列，所以他選 iOS 先上完全合理；他的 Live Captions 是第二列的折衷版，也是他 app 裡最難、鎖在 Pro 的功能。
+
+你的需求「任何 app 內」是第二列。這一列 Android 容易、iOS 難。所以：
+
+- 想走 EasyComix 的路：iOS 自家閱讀器先做，跨 app 用截圖捷徑補。
+- 「任何 app 內」是核心賣點：Android 先做，iOS 用自家閱讀器加截圖捷徑跟上。
+
+## 6. 小說在 Android 多一條路：AccessibilityService
+
+很多閱讀 app 用原生 TextView 渲染文字，無障礙服務可以直接讀到畫面上的文字節點，不用擷取螢幕、不用 OCR，速度快、零誤字，也不會每次跳系統對話框。
+
+- 讀不到文字（WebView、自繪 canvas）時，退到 MediaProjection 加 ML Kit OCR。
+- Play 商店對 AccessibilityService 用途審核嚴格，上架說明要講清楚是給使用者翻譯畫面文字，並在 app 內提供明確的宣告畫面。
+- 漫畫不適用這條路，漫畫的文字是圖片。
+
+小說的完整做法與成本見 [05-novels.md](05-novels.md)。
