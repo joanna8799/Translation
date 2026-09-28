@@ -14,6 +14,7 @@
 | [docs/03-architecture-and-cost-model.md](docs/03-architecture-and-cost-model.md) | 建議架構、三層翻譯引擎、每頁／每用戶成本試算、定價、授權注意 |
 | [docs/04-roadmap.md](docs/04-roadmap.md) | MVP 路線圖與風險 |
 | [docs/05-novels.md](docs/05-novels.md) | 小說：三種來源的做法、token 計費的成本模型、小說專屬省錢手法 |
+| [docs/06-live-mode.md](docs/06-live-mode.md) | 即時模式（捲動自動更新）：Android 就地覆蓋與 iOS 廣播加 PiP 的完整設計、內容保護的限制、即時模式的成本控制、先做的技術驗證 |
 | [docs/references.md](docs/references.md) | 所有參考來源 |
 
 ## 一頁結論
@@ -32,15 +33,25 @@
 他主打的模式是截圖加捷徑：在任何 app 看漫畫時用背面輕點、動作按鈕、AssistiveTouch 或 Siri 觸發，iOS 截圖交給 EasyComix，端側偵測氣泡、OCR、翻譯、畫回氣泡，翻好的整頁顯示在原 app 上方，滑掉繼續看下一頁。
 這條路在 iOS 上容易做、沒有審核風險，是 iOS 上「任何 app 內」的正解，只是每頁要按一下。
 另外他有自家閱讀器（貼網址、匯入 PDF/CBZ、相簿選圖）和 Pro 限定的 Live Captions（背景錄影加子母畫面字幕條，即時但只能顯示字幕）。
-iOS 與 Android 真正的差別只有一個：Android 可以做即時懸浮覆蓋，iOS 要每頁按一下。
+
+**本專案的目標是「捲動就自動更新」的即時模式**
+
+| | Android | iOS |
+|---|---|---|
+| 做得到嗎 | 做得到，就地覆蓋在氣泡上 | 做得到自動更新，但顯示在浮動的子母畫面視窗裡（字幕或翻好的區域鏡像），不是就地 |
+| 機制 | 螢幕擷取加懸浮窗 | ReplayKit 廣播擷取加 PiP，EasyComix Live Captions 的做法 |
+| 難度 | 中 | 高，要先做 1 到 2 週技術驗證 |
+| 擋得住的 app | 設 FLAG_SECURE 的 app 黑畫面 | 偵測到錄影就遮內容的 app；截圖捷徑仍可用當備案 |
+
+細節見 docs/06。iOS 上真正「就地又自動」只有 Safari 擴充（網頁內容），原生 app 只能 PiP。
 
 **「全平台」實際做得到的範圍**
 
 | 你要的 | 能做到的 |
 |---|---|
 | 所有瀏覽器 | 可以。一份 WebExtension 出 Chrome、Edge、Firefox、Safari 桌面版，再包成 iOS Safari 擴充。網頁小說在這一層幾乎是免費附送。 |
-| 手機任何 app 內 | Android 可以即時，漫畫用螢幕擷取 + 懸浮窗，小說多一條 AccessibilityService 直接讀文字的路。iOS 用截圖捷徑，每頁按一下，這是 EasyComix 主打的做法。 |
-| 就地把氣泡換成中文 | 瀏覽器可以、Android 可以、iOS 截圖捷徑與自家閱讀器都可以，只是不是即時。 |
+| 手機任何 app 內，自動更新 | Android 可以，就地覆蓋。iOS 可以，但在 PiP 浮動視窗裡顯示；截圖捷徑當所有 app 都能用的備案。 |
+| 就地把氣泡換成中文 | 瀏覽器可以、Android 可以、iOS 只在 Safari 擴充、自家閱讀器與截圖捷徑裡可以，PiP 視窗裡是鏡像不是就地。 |
 
 **建議架構的一句話**：看得到內容的地方做辨識，雲端只收文字，免費層不碰雲端。
 

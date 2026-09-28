@@ -93,7 +93,7 @@ iOS 不允許任何 app 畫在別的 app 上面，也不允許背景即時讀取
 - 擴充程序只有 50 MB 記憶體上限，超過就被殺。所以只能跑很小的 OCR，或用系統的 Vision framework（`VNRecognizeTextRequest`，支援中、日、韓，但直式文字支援仍不穩，需要實測）。
 - 顯示端用 Picture-in-Picture 視窗。PiP 只能播「影片」，所以要把譯文畫成影格塞進 `AVSampleBufferDisplayLayer`。這就是為什麼 EasyComix 的 Live Captions 是一個浮動字幕條，而不是就地替換氣泡。
 - 使用者要先框選一個區域，之後在自己的閱讀 app 裡捲動，字幕條跟著更新。
-- 這是整個計畫裡技術風險最高的一塊，Apple 審核對 ReplayKit 的用途也會盤問。建議放到最後做，先做 3a 與 Safari 擴充。
+- 這是整個計畫裡技術風險最高的一塊。因為本專案要的是「捲動自動更新」，這塊是必做，先用 1 到 2 週做技術驗證再進產品。完整設計、資料流、五個必處理的細節與驗證清單見 [06-live-mode.md](06-live-mode.md)。
 
 ### 3c. Safari Web Extension
 
@@ -108,10 +108,10 @@ iOS 不允許任何 app 畫在別的 app 上面，也不允許背景即時讀取
 | 你要的 | 能給的 |
 |---|---|
 | 所有瀏覽器 | 一份 WebExtension 出 Chrome、Edge、Firefox、Safari 桌面版，加 iOS Safari，加 Android 第三方瀏覽器 |
-| 手機任何 app 內 | Android：即時懸浮覆蓋。iOS：截圖捷徑，每頁按一下（EasyComix 主打，容易）；PiP 字幕條才是即時的，但難做 |
-| 就地畫回氣泡 | 瀏覽器可以、Android 可以、iOS 截圖捷徑與自家閱讀器都可以，只是 iOS 不是即時的 |
+| 手機任何 app 內，自動更新 | Android：即時就地覆蓋。iOS：即時，但顯示在 PiP 浮動視窗（字幕或鏡像）；截圖捷徑每頁按一下當備案 |
+| 就地畫回氣泡 | 瀏覽器可以、Android 可以、iOS 在 Safari 擴充、自家閱讀器、截圖捷徑裡可以；PiP 視窗裡是鏡像 |
 
-iOS 與 Android 真正的差別只有一個：Android 可以「即時」，iOS 要「每頁按一下」。
+iOS 與 Android 真正的差別只有一個：Android 的即時翻譯畫在原畫面上，iOS 的即時翻譯畫在一個浮動視窗裡。
 
 ## 5. EasyComix 只做 iOS，那 iOS 到底難不難
 
@@ -128,9 +128,9 @@ EasyComix 做的是第一列加第二列，第三列只做了字幕條版。他�
 
 對我們的意義：
 
-- iOS 的「任何 app 內」用截圖捷徑做，成本低、風險低，可以跟自家閱讀器一起在早期做完。
-- Android 額外多了「即時」，這是 EasyComix 沒有的差異化。
-- PiP 字幕條放最後，甚至可以不做。
+- 本專案要的是第三列「即時」。Android 直接做；iOS 走 EasyComix Live Captions 的路（廣播擷取加 PiP），是必做而不是選配，但要先做技術驗證。
+- 截圖捷徑成本低、風險低，而且是唯一在所有 app 上都能用的模式（內容保護擋不住 iOS 截圖），保留當備案。
+- Android 的即時是就地覆蓋，這是 EasyComix 沒有的差異化。
 
 ## 6. 小說在 Android 多一條路：AccessibilityService
 
