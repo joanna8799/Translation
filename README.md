@@ -4,7 +4,7 @@
 但採用沈浸式翻譯的鋪法：所有瀏覽器都能裝、手機上任何 app 內的內容都能翻。
 
 目前內容：評估文件（docs/）與 iOS 即時模式技術驗證專案（ios-spike/，Phase 0b，尚未在 Xcode 編譯過）。
-另附一份獨立的旅行即時對話翻譯評估（docs/07），回答「出國時用 iPhone 即時翻譯對話」該用什麼方案。
+另附一份獨立的旅行即時對話翻譯評估（docs/07）與對應的技術驗證專案（ios-talk-spike/），回答「出國時用 iPhone 加一般耳機自己做即時口譯」怎麼做。
 
 ## 文件索引
 
@@ -19,6 +19,7 @@
 | [docs/07-travel-conversation.md](docs/07-travel-conversation.md) | 旅行即時對話翻譯（與漫畫無關）：iPhone 17 無 AI 耳機的五種方案比較、設備需求、出發前設定步驟、幣值轉換、自製 app 的架構與工作量評估 |
 | [docs/references.md](docs/references.md) | 所有參考來源 |
 | [ios-spike/README.md](ios-spike/README.md) | iOS 即時模式技術驗證專案：廣播擴充加 PiP 的最小實作、五項驗證的操作步驟、結果記錄表 |
+| [ios-talk-spike/README.md](ios-talk-spike/README.md) | 旅行即時口譯技術驗證專案：用一般耳機（不需 AirPods）做雙向語音翻譯，iOS 26 端側語音辨識加翻譯，五項驗證與結果記錄表 |
 
 ## 一頁結論
 

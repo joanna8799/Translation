@@ -1,0 +1,51 @@
+# XcodeGen 專案描述。用法：
+#   brew install xcodegen
+#   cd ios-talk-spike && xcodegen generate && open TalkSpike.xcodeproj
+#
+# 使用前要改：
+#   1. DEVELOPMENT_TEAM（你的 Apple Developer Team ID）
+#   2. com.example.talkspike 換成你自己的 bundle ID
+#
+# 不需要 App Group、不需要擴充，單一 app target。
+# 要 iOS 26：SpeechAnalyzer / SpeechTranscriber 是 iOS 26 才有的。
+
+name: TalkSpike
+
+options:
+  bundleIdPrefix: com.example.talkspike
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: XXXXXXXXXX
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    TARGETED_DEVICE_FAMILY: "1"
+    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+
+targets:
+  TalkSpike:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: TalkSpike
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        # audio：手機放口袋、螢幕鎖住時麥克風與耳機播放要繼續。
+        UIBackgroundModes:
+          - audio
+        NSMicrophoneUsageDescription: "收對方講話的聲音，在手機上辨識與翻譯，不上傳。"
+        NSSpeechRecognitionUsageDescription: "在裝置上把語音轉成文字。"
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.talkspike
