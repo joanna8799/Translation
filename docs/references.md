@@ -84,3 +84,27 @@
 - AI Manga Translate：https://aimangatranslate.com/price
 - 2026 漫畫翻譯工具比較（Pawaka Labs）：https://pawakalabs.com/2026/03/01/best-tools-to-translate-manga-in-2026-tested-and-ranked/
 - 2026 漫畫翻譯工具比較（KitsuTL）：https://www.kitsutl.com/blog/manga-translation-tools-comparison-2026
+
+## 旅行即時對話翻譯（docs/07）
+
+- Apple 翻譯 app（App Store）：https://apps.apple.com/app/translate/id1514844618
+- Apple 支援：用 AirPods 翻譯面對面對話：https://support.apple.com/guide/airpods/dev9c215ca94
+- Apple 支援：AirPods 即時翻譯：https://support.apple.com/en-lamr/123185
+- 9to5mac：iOS 26.1 AirPods 即時翻譯新增語言：https://9to5mac.com/2025/11/07/ios-26-1-makes-airpods-pros-latest-feature-even-better-heres-whats-new/
+- TechNews：iOS 26.1 即時翻譯加入繁體中文：https://technews.tw/2025/09/23/ios-26-1-beta-1-apple-intelligence-traditional-chinese/
+- Apple Newsroom：AirPods 即時翻譯擴展到歐盟：https://www.apple.com/ie/newsroom/2025/11/live-translation-on-airpods-expands-to-the-eu/
+- Boostlingo：AirPods 即時翻譯實測：https://boostlingo.com/blog/testing-new-airpods-live-translation/
+- 瘋先生：AirPods Pro 3 台灣開賣與規格：https://mrmad.com.tw/airpods-pro-3-taiwan-specs-review
+- Google 部落格：Gemini 翻譯能力進入 Google 翻譯：https://blog.google/products/search/gemini-capabilities-translation-upgrades/
+- 9to5google：Google 翻譯耳機即時翻譯：https://9to5google.com/2025/12/12/google-translate-gemini-headphones/
+- Notebookcheck：Google 翻譯 iOS 版加入即時翻譯：https://www.notebookcheck.net/Google-Translate-for-iOS-gets-game-changing-Live-Translate-feature.1260287.0.html
+- AlternativeTo：即時翻譯擴展到 iOS 與更多國家：https://alternativeto.net/news/2026/3/google-translate-s-real-time-headphone-translation-feature-expands-to-ios-and-more-countries
+- Gigazine：Gemini 3.5 Live Translate：https://gigazine.net/gsc_news/en/20260610-google-gemini-3-5-live-translate/
+- TechRadar：Timekettle Fluentalk T1 評測：https://www.techradar.com/reviews/timekettle-fluentalk-t1-handheld-translator-review
+- Timekettle 產品與價格：https://www.timekettle.co/collections
+- Vasco 與 Pocketalk 比較：https://foliumbiosciences.com/vasco-vs-pocketalk-which-translator-is-best-for-travel/
+- Android Authority：Microsoft 翻譯 Converse 停用：https://cellphoneplans.androidauthority.com/CellPhones/Guides/is-microsoft-translator-worth-downloading
+- Apple 開發者文件：SpeechTranscriber：https://developer.apple.com/documentation/speech/speechtranscriber
+- Gigazine：SpeechAnalyzer 與 Whisper 比較：https://gigazine.net/gsc_news/en/20250619-apple-speech-analyzer
+- Blake Crosley：Apple Translation framework：https://blakecrosley.com/blog/apple-translation-framework-on-device
+- WWDC24 Meet the Translation API：https://wwdcnotes.com/documentation/wwdc24-10117-meet-the-translation-api/
