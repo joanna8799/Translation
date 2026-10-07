@@ -222,6 +222,9 @@ final class TalkModel: ObservableObject {
         let fx: TranscriptCandidate
         do {
             (zh, fx) = try await (zhTask, fxTask)
+        } catch is CancellationError {
+            // 按「停止」時正在處理的那一句會被取消，這不是錯誤。
+            return
         } catch {
             lastError = "辨識失敗：\(error)"
             Metrics.shared.log("turn.asr.error", [:], ["error": String(describing: error)])
@@ -242,6 +245,8 @@ final class TalkModel: ObservableObject {
             case .them: translated = try await toChinese.translate(decision.chosen.text)
             case .me: translated = try await toForeign.translate(decision.chosen.text)
             }
+        } catch is CancellationError {
+            return
         } catch {
             lastError = "翻譯失敗：\(error)"
             Metrics.shared.log("turn.translate.error", [:], ["error": String(describing: error)])
