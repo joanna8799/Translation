@@ -70,6 +70,8 @@ jobs:
   ipa:
     runs-on: macos-26
     needs: build
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode
@@ -104,3 +106,17 @@ jobs:
         with:
           name: TalkSpike-unsigned-ipa
           path: ios-talk-spike/TalkSpike-unsigned.ipa
+
+      # 固定網址的 pre-release，手機上用 Safari 就能直接下載，不用登入 GitHub、不用解壓：
+      # https://github.com/joanna8799/Translation/releases/download/talkspike-latest/TalkSpike-unsigned.ipa
+      - name: Publish .ipa to rolling pre-release
+        working-directory: ios-talk-spike
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete talkspike-latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create talkspike-latest TalkSpike-unsigned.ipa \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "TalkSpike 最新未簽章 .ipa" \
+            --notes "自動產出，commit ${GITHUB_SHA:0:7}，分支 ${GITHUB_REF_NAME}。未簽章，請用 AltStore 或 Sideloadly 以自己的 Apple ID 簽章安裝，步驟見 ios-talk-spike/INSTALL.md。"

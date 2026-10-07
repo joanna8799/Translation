@@ -2,7 +2,7 @@
 
 iOS app 要裝到真機一定要經過 Apple 的簽章，沒有繞法。依你手邊有什麼選一條：
 
-| | A. 有 Mac | B. 沒 Mac，但願意付 Apple Developer Program（US$99/年） | C. 沒 Mac、不付費，有 Windows 或 Mac 電腦 |
+| | A. 有 Mac | B. 沒 Mac，但願意付 Apple Developer Program（US$99/年） | C. 沒 Mac、不付費，有 Windows 電腦 |
 |---|---|---|---|
 | 要準備什麼 | Mac（macOS 15.6 以上）、Xcode 26、傳輸線 | Apple 開發者帳號、App Store Connect API 金鑰 | 一台電腦裝 AltServer、免費 Apple ID |
 | 誰做簽章 | Xcode 用你的免費 Apple ID | GitHub Actions 用你的開發者憑證，上傳 TestFlight | AltStore 用你的免費 Apple ID |
@@ -41,17 +41,60 @@ Secrets 名稱：`ASC_KEY_ID`、`ASC_ISSUER_ID`、`ASC_KEY_P8`（整個 .p8 檔�
 
 這條路也是之後要上架的必經之路，付了就不浪費。
 
-## C. 沒 Mac、不付費：AltStore
+## C. 沒 Mac、不付費：Windows 電腦加 AltStore
 
-GitHub Actions 已經會產出未簽章的 `TalkSpike-unsigned.ipa`（Actions > 最新一次 iOS build > Artifacts > TalkSpike-unsigned-ipa）。用 AltStore 以免費 Apple ID 簽章裝到手機：
+原理：GitHub Actions 每次推送都會產出未簽章的 `TalkSpike-unsigned.ipa`，固定網址：
 
-1. 電腦裝 AltServer：https://altstore.io （Windows 要先從 Apple 官網裝 iTunes 與 iCloud，不能用 Microsoft Store 版）。
-2. iPhone 接電腦，AltServer > Install AltStore > 選你的 iPhone，輸入 Apple ID（建議用一個專門的免費 Apple ID）。
-3. iPhone 上開 AltStore，設定 > 一般 > VPN 與裝置管理 信任那個 Apple ID；設定 > 隱私權與安全性 > 開發者模式打開。
-4. 把下載的 `TalkSpike-unsigned.ipa` AirDrop 或傳到手機，用 AltStore 的「+」選那個檔案，它會簽章並安裝。
-5. 7 天到期前讓手機和電腦在同一個 Wi-Fi、AltServer 開著，AltStore 會自動續期。
+```
+https://github.com/joanna8799/Translation/releases/download/talkspike-latest/TalkSpike-unsigned.ipa
+```
 
-限制跟 A 一樣：7 天、最多 3 個 app。TalkSpike 不需要 App Group 之類的特殊權限，免費帳號簽得過；LiveSpike（漫畫那個）有廣播擴充和 App Group，用 AltStore 不一定裝得起來，那個還是走 A 或 B。
+AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天到期（AltStore 會自動續）、同時最多 3 個這樣裝的 app、免費帳號一週最多註冊 10 個不同的 bundle ID（重裝同一個不算）。
+
+### C1. 電腦端，只做一次
+
+1. 到 Apple 官網裝 **iTunes** 與 **iCloud**（Windows 版，一定要 Apple 官網的安裝檔，不能用 Microsoft Store 版，AltServer 認不到）：
+   https://support.apple.com/zh-tw/HT210384 （iTunes）、https://support.apple.com/zh-tw/HT204283 （iCloud）
+2. 到 https://altstore.io 下載 **AltStore Classic** 的 AltServer for Windows，解壓後執行 `Setup.exe`。裝好後系統匣會多一個 AltServer 圖示。
+3. 建議另外申請一個專門拿來簽章的免費 Apple ID（不是必要，但簽章用的帳號會被 Apple 加上開發者相關的紀錄，用小號比較乾淨）。
+
+### C2. 手機端，只做一次
+
+1. iPhone 用傳輸線接電腦，手機上按「信任這部電腦」。iTunes 若跳出來把它關掉就好。
+2. 系統匣右鍵 AltServer 圖示 > **Install AltStore** > 選你的 iPhone > 輸入 Apple ID 與密碼（會要兩步驟驗證碼）。
+3. 手機上出現 AltStore，但還不能開。到 設定 > 一般 > VPN 與裝置管理 > 點你的 Apple ID > **信任**。
+4. 設定 > 隱私權與安全性 > **開發者模式** 打開，手機會重開機。（這個選項要裝過非 App Store 的 app 才會出現，做完第 2 步再去找。）
+5. 開 AltStore，左下 Settings 登入同一個 Apple ID。
+
+### C3. 裝 TalkSpike，每次有新版都這樣做
+
+1. 手機上用 **Safari** 開上面那個固定網址，下載 `.ipa`（檔案會進「檔案」app 的下載項目）。
+2. 開 AltStore > My Apps > 左上角「+」> 選剛下載的 `TalkSpike-unsigned.ipa`。AltStore 會簽章並安裝，約 30 秒到 1 分鐘。
+   做這一步時手機和電腦要在同一個 Wi-Fi，而且電腦上的 AltServer 要開著（簽章是電腦做的）。
+3. 第一次開 TalkSpike 會要麥克風權限，允許。
+4. 之後有新 commit 推上去，重複 1 到 2，直接覆蓋安裝，之前的量測紀錄會留著。
+
+### C4. 讓它不過期
+
+每 7 天要續簽。AltStore 的做法：手機和電腦在同一個 Wi-Fi、AltServer 開著，AltStore 會在背景自動續；不放心就開 AltStore > My Apps 按 **Refresh All**。到期的 app 圖示還在但打不開，續簽後資料不會掉。
+
+### 另一個選擇：Sideloadly
+
+不想在手機上多裝 AltStore 的話，用 https://sideloadly.io ：同樣要先裝 Apple 官網的 iTunes，開 Sideloadly 把 `.ipa` 拖進去、填 Apple ID、按 Start 就裝好。缺點是續簽要手動（或讓電腦一直開著並開它的 Wi-Fi 自動續簽）。兩個都用免費 Apple ID，限制一樣。
+
+### 常見錯誤
+
+| 看到什麼 | 原因與解法 |
+|---|---|
+| AltServer 找不到裝置 | iTunes 不是 Apple 官網版、或手機沒按「信任這部電腦」。重裝 iTunes（官網版）後重新接線。 |
+| 「無法安裝，開發者不受信任」 | 設定 > 一般 > VPN 與裝置管理 去信任那個 Apple ID。 |
+| 安裝後點 app 沒反應、或跳「需要開發者模式」 | 設定 > 隱私權與安全性 > 開發者模式打開。 |
+| 「You have reached the maximum number of apps」 | 免費帳號最多 3 個，刪掉一個再裝。 |
+| 「Could not register App ID」 | 一週 10 個 App ID 的上限到了，等幾天，或換一個 Apple ID。 |
+| AltStore 說找不到 AltServer | 電腦和手機不在同一個 Wi-Fi，或防火牆擋了 AltServer；先用傳輸線接著再試。 |
+| TalkSpike 開了但「準備」卡在下載語言模型 | 這是 Apple 的伺服器在下載 Speech 模型，要穩定的網路，第一次每個語言幾百 MB。 |
+
+TalkSpike 不需要 App Group 之類的特殊權限，免費帳號簽得過。LiveSpike（漫畫那個）有廣播擴充和 App Group，AltStore 不一定裝得起來，那個還是走 A 或 B。
 
 ## 裝好之後
 
