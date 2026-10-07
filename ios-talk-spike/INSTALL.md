@@ -68,8 +68,8 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 
 ### C2. 手機端，只做一次
 
-1. iPhone 用傳輸線接電腦，手機上按「信任這部電腦」。iTunes 若跳出來，關掉即可。
-   （「透過 Wi-Fi 同步」不是必要的：接著線 AltServer 就能透過 USB 跟手機通訊。只有想每週不接線自動續簽、而且電腦和手機在同一個 Wi-Fi 時才需要勾。）
+1. iPhone 用傳輸線接電腦，手機上按「信任這部電腦」。開 iTunes > 左上角手機圖示 > 摘要 > 選項 > 勾 **「透過 Wi-Fi 與此 iPhone 同步」** > 套用。
+   這個勾選**不需要**電腦和手機在同一個 Wi-Fi，接著線就能勾。它是 AltStore 之後透過 USB 找到 AltServer 的必要條件，沒勾會出現錯誤 1200「AltServer could not be found」。
 2. 系統匣右鍵 AltServer 圖示 > **Install AltStore** > 選你的 iPhone > 輸入 Apple ID 與密碼（會要兩步驟驗證碼）。
 3. 手機上出現 AltStore，但還不能開。到 設定 > 一般 > VPN 與裝置管理 > 點你的 Apple ID > **信任**。
 4. 設定 > 隱私權與安全性 > **開發者模式** 打開，手機會重開機。（這個選項要裝過非 App Store 的 app 才會出現，做完第 2 步再去找。）
@@ -93,6 +93,10 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 
 到期的 app 圖示還在但打不開，續簽後資料不會掉。
 
+### 「Remote AltServer」是什麼
+
+AltStore 設定頁裡的 Set up Remote AltServer 是 2.3 測試版的新功能：匯入一個配對檔、填一個遠端 anisette 伺服器網址，之後簽章與續簽不用電腦。目前只開放給 Patreon 贊助者，公開版還沒推，先不用理它。
+
 ### 另一個選擇：Sideloadly
 
 不想在手機上多裝 AltStore 的話，用 https://sideloadly.io ：同樣要先裝 Apple 官網的 iTunes，開 Sideloadly 把 `.ipa` 拖進去、填 Apple ID、按 Start 就裝好。缺點是續簽要手動（或讓電腦一直開著並開它的 Wi-Fi 自動續簽）。兩個都用免費 Apple ID，限制一樣。
@@ -106,7 +110,7 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 | 安裝後點 app 沒反應、或跳「需要開發者模式」 | 設定 > 隱私權與安全性 > 開發者模式打開。 |
 | 「You have reached the maximum number of apps」 | 免費帳號最多 3 個，刪掉一個再裝。 |
 | 「Could not register App ID」 | 一週 10 個 App ID 的上限到了，等幾天，或換一個 Apple ID。 |
-| AltStore 說找不到 AltServer | 電腦和手機不在同一個 Wi-Fi，或防火牆擋了 AltServer；先用傳輸線接著再試。 |
+| AltStore 說找不到 AltServer（錯誤 1200） | 依序檢查：手機有接線；iTunes 裝置頁有勾「透過 Wi-Fi 同步」；AltServer 在跑（右下角有圖示）；Windows 防火牆允許 AltServer 用私人網路；services.msc 裡 Apple Mobile Device Service 是執行中。都對還不行就把 AltServer 關掉以系統管理員重開，或讓電腦連上 iPhone 的個人熱點。 |
 | TalkSpike 開了但「準備」卡在下載語言模型 | 這是 Apple 的伺服器在下載 Speech 模型，要穩定的網路，第一次每個語言幾百 MB。 |
 
 TalkSpike 不需要 App Group 之類的特殊權限，免費帳號簽得過。LiveSpike（漫畫那個）有廣播擴充和 App Group，AltStore 不一定裝得起來，那個還是走 A 或 B。
