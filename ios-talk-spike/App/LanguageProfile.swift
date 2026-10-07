@@ -32,6 +32,11 @@ struct LanguageProfile: Identifiable, Hashable {
         LanguageProfile(id: "it", displayName: "義大利文", speechLocale: "it-IT", translationLanguage: "it", ttsLanguage: "it-IT", defaultCurrency: "EUR", script: .latin),
         LanguageProfile(id: "vi", displayName: "越南文", speechLocale: "vi-VN", translationLanguage: "vi", ttsLanguage: "vi-VN", defaultCurrency: "VND", script: .latin),
         LanguageProfile(id: "id", displayName: "印尼文", speechLocale: "id-ID", translationLanguage: "id", ttsLanguage: "id-ID", defaultCurrency: "IDR", script: .latin),
+        // 北歐：Apple 的翻譯要 iOS 27 才有挪威文、瑞典文、丹麥文，芬蘭文目前沒有；語音辨識支不支援按「準備」時會告訴你。
+        LanguageProfile(id: "nb", displayName: "挪威文（Bokmål）", speechLocale: "nb-NO", translationLanguage: "nb", ttsLanguage: "nb-NO", defaultCurrency: "NOK", script: .latin),
+        LanguageProfile(id: "sv", displayName: "瑞典文", speechLocale: "sv-SE", translationLanguage: "sv", ttsLanguage: "sv-SE", defaultCurrency: "SEK", script: .latin),
+        LanguageProfile(id: "da", displayName: "丹麥文", speechLocale: "da-DK", translationLanguage: "da", ttsLanguage: "da-DK", defaultCurrency: "DKK", script: .latin),
+        LanguageProfile(id: "fi", displayName: "芬蘭文", speechLocale: "fi-FI", translationLanguage: "fi", ttsLanguage: "fi-FI", defaultCurrency: "EUR", script: .latin),
     ]
 
     var locale: Locale { Locale(identifier: speechLocale) }

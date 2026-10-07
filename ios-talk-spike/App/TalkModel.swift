@@ -128,11 +128,26 @@ final class TalkModel: ObservableObject {
     }
 
     func setForeign(_ profile: LanguageProfile) {
+        guard profile != foreign else { return }
         foreign = profile
         toChinese.sourceLanguage = profile.translationLanguage
         toForeign.targetLanguage = profile.translationLanguage
         ready = false
-        assetStatus = "語言已切換，請重新準備"
+        assetStatus = "語言已切換，準備中…"
+        Task { await prepare() }
+    }
+
+    var lastMine: Turn? { turns.last(where: { $0.side == .me && !$0.translated.isEmpty }) }
+    var lastTheirs: Turn? { turns.last(where: { $0.side == .them && !$0.translated.isEmpty }) }
+
+    /// 耳機／擴音的簡短說法，給主畫面用。
+    var routeShort: String {
+        if routeDescription.contains("BluetoothA2DP") { return "藍牙耳機" }
+        if routeDescription.contains("Headphones") { return "有線耳機" }
+        if routeDescription.contains("BluetoothHFP") { return "藍牙 HFP（音質差）" }
+        if routeDescription.contains("Speaker") { return "擴音" }
+        if routeDescription.contains("Receiver") { return "聽筒" }
+        return "未知"
     }
 
     // MARK: - 準備
@@ -259,7 +274,7 @@ final class TalkModel: ObservableObject {
 
         var turn = Turn(side: decision.side, original: decision.chosen.text, translated: translated, currencyNote: note,
                         asrMs: asrMs, translateMs: translateMs, e2eMs: 0, decisionNote: decision.note, judgedCorrect: nil)
-        turns.insert(turn, at: 0)
+        turns.append(turn)
 
         // 輸出。對方講的：翻成中文唸給我聽（耳機模式走耳機，擴音模式走擴音）。
         // 我講的：螢幕顯示外語；擴音模式或開了自動播放才唸給對方。
@@ -307,8 +322,14 @@ final class TalkModel: ObservableObject {
 
     /// 「播給對方」按鈕：把最近一句我講的翻譯用擴音唸出來。
     func replayLastMineToThem() {
-        guard let turn = turns.first(where: { $0.side == .me && !$0.translated.isEmpty }) else { return }
+        guard let turn = lastMine, state != .idle else { return }
         Task { _ = await speak(turn.translated, language: foreign.ttsLanguage, toSpeaker: true, since: Date().timeIntervalSince1970) }
+    }
+
+    /// 「再聽一次」：把對方最近一句的中文再唸一次給自己。
+    func replayLastTheirsToMe() {
+        guard let turn = lastTheirs, state != .idle else { return }
+        Task { _ = await speak(turn.translated, language: LanguageProfile.chinese.ttsLanguage, toSpeaker: outputMode == .speaker, since: Date().timeIntervalSince1970) }
     }
 
     func judge(_ turn: Turn, correct: Bool) {
