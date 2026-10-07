@@ -55,10 +55,16 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 
 1. 到 Apple 官網裝 **iTunes** 與 **iCloud**（Windows 版，一定要 Apple 官網的安裝檔，不能用 Microsoft Store 版，AltServer 認不到；已經裝了 Store 版的先解除安裝）：
    - iTunes 64 位元直接下載：https://www.apple.com/itunes/download/win64 （Apple 的 iTunes 頁面在 Windows 10/11 上會把你導去 Microsoft Store，所以要用這個直接連結）
-   - iCloud：https://support.apple.com/zh-tw/HT204283 ，頁面上的「下載」按鈕
+   - iCloud：Apple 的支援頁現在只導去 Microsoft Store，請用 AltStore 官方 FAQ 提供的直接安裝檔：
+     https://updates.cdn-apple.com/2020/windows/001-39935-20200911-1A70AA56-F448-11EA-8CC0-99D41950005E/iCloudSetup.exe
+     （這是較舊的 iCloud 7.x，AltServer 只需要它的登入元件，裝完不用登入、不用開）
 2. 到 https://altstore.io 按 **Download AltServer for Windows**（AltStore Classic），解壓 `AltInstaller.zip` 後執行 `Setup.exe`。裝好後在 Windows 搜尋列打 AltServer，以系統管理員身分執行，系統匣會多一個圖示。
    官方圖文步驟：https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows
-3. 建議另外申請一個專門拿來簽章的免費 Apple ID（不是必要，但簽章用的帳號會被 Apple 加上開發者相關的紀錄，用小號比較乾淨）。
+3. 可以用自己的 Apple ID，也可以另外申請一個小號（差別只在要不要把主帳號密碼打進第三方工具）。**全新申請的 Apple ID 要先做兩件事，否則 AltServer 會登入失敗**：
+   - 到 https://account.apple.com 登入，確認「雙重認證」已開啟（用手機號碼當信任號碼即可）。
+   - 到 https://developer.apple.com/account 用同一個 Apple ID 登入一次，勾選同意 Apple Developer Agreement。免費，不用付錢，這一步會把帳號變成「免費開發者帳號」，AltServer 才簽得了章。
+   - 還是失敗的話，在 iPhone 上 設定 > 你的名字 > 媒體與購買項目 > 登出，改用小號登入一次再登出換回來，讓 Apple 認得這個帳號用過 iOS 裝置。
+4. Windows 跳出「Windows 已保護您的電腦」時按「其他資訊 > 仍要執行」，AltServer 與舊版 iCloud 安裝檔都沒有 Microsoft 的簽章，這是正常的。
 
 ### C2. 手機端，只做一次
 
