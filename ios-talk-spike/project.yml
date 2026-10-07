@@ -25,6 +25,10 @@ settings:
     SWIFT_STRICT_CONCURRENCY: minimal
     TARGETED_DEVICE_FAMILY: "1"
     IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    # CI 會用 1.0.<run number> 覆蓋，AltStore 靠版本號判斷有沒有新版。
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
 
 targets:
   TalkSpike:

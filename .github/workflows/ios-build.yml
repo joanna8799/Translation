@@ -83,6 +83,9 @@ jobs:
         run: xcodegen generate
       - name: Build for device (unsigned)
         working-directory: ios-talk-spike
+        env:
+          APP_VERSION: 1.0.${{ github.run_number }}
+          APP_BUILD: ${{ github.run_number }}
         run: |
           set -o pipefail
           xcodebuild \
@@ -92,15 +95,60 @@ jobs:
             -destination "generic/platform=iOS" \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" \
+            MARKETING_VERSION="$APP_VERSION" CURRENT_PROJECT_VERSION="$APP_BUILD" \
             build 2>&1 | tee device-build.log | grep -E "error:|BUILD|\*\* " || true
           grep -q "BUILD SUCCEEDED" device-build.log
-      - name: Package .ipa
+      - name: Package .ipa and AltStore source
         working-directory: ios-talk-spike
+        env:
+          APP_VERSION: 1.0.${{ github.run_number }}
+          APP_BUILD: ${{ github.run_number }}
         run: |
           rm -rf Payload && mkdir Payload
           cp -R build/Build/Products/Release-iphoneos/TalkSpike.app Payload/
           zip -qr TalkSpike-unsigned.ipa Payload
-          ls -la TalkSpike-unsigned.ipa
+          cp App/Assets.xcassets/AppIcon.appiconset/icon-1024.png icon.png
+          SIZE=$(stat -f%z TalkSpike-unsigned.ipa)
+          DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/talkspike-latest"
+          NOTES="commit ${GITHUB_SHA:0:7}：$(git log -1 --pretty=%s | tr '"' "'")"
+          cat > altstore.json <<JSON
+          {
+            "name": "TalkSpike 測試版",
+            "identifier": "com.example.talkspike.source",
+            "subtitle": "旅行即時口譯技術驗證",
+            "description": "每次推送自動產出的未簽章測試版。由 AltStore 用你自己的 Apple ID 簽章安裝。",
+            "iconURL": "${BASE}/icon.png",
+            "website": "https://github.com/${GITHUB_REPOSITORY}",
+            "tintColor": "#1E64C8",
+            "featuredApps": ["com.example.talkspike"],
+            "apps": [
+              {
+                "name": "TalkSpike",
+                "bundleIdentifier": "com.example.talkspike",
+                "developerName": "joanna8799",
+                "subtitle": "一般耳機就能用的雙向即時口譯",
+                "localizedDescription": "對方講外語，耳機裡聽中文；你講中文，翻成外語給對方看或唸出來。全部在 iPhone 上運算。",
+                "iconURL": "${BASE}/icon.png",
+                "tintColor": "#1E64C8",
+                "category": "utilities",
+                "versions": [
+                  {
+                    "version": "${APP_VERSION}",
+                    "buildVersion": "${APP_BUILD}",
+                    "date": "${DATE}",
+                    "localizedDescription": "${NOTES}",
+                    "downloadURL": "${BASE}/TalkSpike-unsigned.ipa",
+                    "size": ${SIZE},
+                    "minOSVersion": "26.0"
+                  }
+                ]
+              }
+            ]
+          }
+          JSON
+          python3 -c "import json;json.load(open('altstore.json'));print('altstore.json valid')"
+          ls -la TalkSpike-unsigned.ipa altstore.json icon.png
       - name: Upload .ipa
         uses: actions/upload-artifact@v4
         with:
@@ -115,8 +163,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete talkspike-latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create talkspike-latest TalkSpike-unsigned.ipa \
+          gh release create talkspike-latest TalkSpike-unsigned.ipa altstore.json icon.png \
             --target "$GITHUB_SHA" \
             --prerelease \
-            --title "TalkSpike 最新未簽章 .ipa" \
-            --notes "自動產出，commit ${GITHUB_SHA:0:7}，分支 ${GITHUB_REF_NAME}。未簽章，請用 AltStore 或 Sideloadly 以自己的 Apple ID 簽章安裝，步驟見 ios-talk-spike/INSTALL.md。"
+            --title "TalkSpike 1.0.${{ github.run_number }}（未簽章）" \
+            --notes "自動產出，commit ${GITHUB_SHA:0:7}，分支 ${GITHUB_REF_NAME}。AltStore 來源網址：https://github.com/${GITHUB_REPOSITORY}/releases/download/talkspike-latest/altstore.json 。步驟見 ios-talk-spike/INSTALL.md。"

@@ -83,6 +83,20 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 3. 第一次開 TalkSpike 會要麥克風權限，允許。
 4. 之後有新 commit 推上去，重複 1 到 2，直接覆蓋安裝，之前的量測紀錄會留著。
 
+### C3b. 訂閱來源，之後一鍵更新
+
+做一次之後，新版不用再 Safari 下載、找檔案：
+
+1. AltStore > 下方 **Sources** > 右上 **+** > 貼上：
+   ```
+   https://github.com/joanna8799/Translation/releases/download/talkspike-latest/altstore.json
+   ```
+   按 Add。
+2. 之後每次我推新版，AltStore 開啟時會自己比對版本，**My Apps** 最上面出現 TalkSpike 的 **Update**，按一下就裝（Browse 分頁裡也找得到）。
+3. 更新時一樣要讓手機連得到 AltServer（接線或同一 Wi-Fi），因為簽章還是電腦做的。這是 AltStore 的限制，沒有辦法完全在背景更新。
+
+版本號是 `1.0.<CI 編號>`，每次推送自動遞增。
+
 ### C4. 讓它不過期
 
 每 7 天要續簽，三種方式擇一：
