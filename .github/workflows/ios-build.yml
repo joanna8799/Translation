@@ -64,3 +64,43 @@ jobs:
         with:
           name: ${{ matrix.dir }}-build-log
           path: ${{ matrix.dir }}/build.log
+
+  # 真機用的未簽章 .ipa：給 AltStore／Sideloadly 這類用免費 Apple ID 自行簽章安裝的工具。
+  # 只做 TalkSpike（不需要 App Group 等特殊權限，免費帳號能簽）。
+  ipa:
+    runs-on: macos-26
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.4.1.app && xcodebuild -version
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate project
+        working-directory: ios-talk-spike
+        run: xcodegen generate
+      - name: Build for device (unsigned)
+        working-directory: ios-talk-spike
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project TalkSpike.xcodeproj \
+            -scheme TalkSpike \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" \
+            build 2>&1 | tee device-build.log | grep -E "error:|BUILD|\*\* " || true
+          grep -q "BUILD SUCCEEDED" device-build.log
+      - name: Package .ipa
+        working-directory: ios-talk-spike
+        run: |
+          rm -rf Payload && mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/TalkSpike.app Payload/
+          zip -qr TalkSpike-unsigned.ipa Payload
+          ls -la TalkSpike-unsigned.ipa
+      - name: Upload .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: TalkSpike-unsigned-ipa
+          path: ios-talk-spike/TalkSpike-unsigned.ipa

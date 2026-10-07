@@ -52,6 +52,8 @@ Metrics：一行一個 JSON 寫到 Documents/talkspike_metrics.jsonl
 
 ## 設定步驟
 
+沒有 Mac、或想知道怎麼不碰 Xcode 就裝到手機：見 [INSTALL.md](INSTALL.md)（三條路：Mac、TestFlight、AltStore）。
+
 1. 安裝 XcodeGen：`brew install xcodegen`
 2. 改 `project.yml` 的 `DEVELOPMENT_TEAM`，把 `com.example.talkspike` 換成你的 bundle ID。
 3. `cd ios-talk-spike && xcodegen generate && open TalkSpike.xcodeproj`
