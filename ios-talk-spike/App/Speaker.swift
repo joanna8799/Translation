@@ -2,7 +2,7 @@ import Foundation
 import AVFoundation
 
 /// AVSpeechSynthesizer 的 async 包裝。用系統內建語音，有下載到「進階」或「增強」品質就優先用。
-final class Speaker: NSObject, AVSpeechSynthesizerDelegate {
+final class Speaker: NSObject, AVSpeechSynthesizerDelegate, @unchecked Sendable {
     private let synthesizer = AVSpeechSynthesizer()
     private var continuation: CheckedContinuation<Void, Never>?
     private(set) var isSpeaking = false

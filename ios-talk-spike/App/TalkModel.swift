@@ -290,9 +290,9 @@ final class TalkModel: ObservableObject {
         var e2e = 0.0
         speaker.onStart = { e2e = (Date().timeIntervalSince1970 - endedAt) * 1000 }
         let needOverride = toSpeaker && audio.hasExternalOutput
-        if needOverride { try? audio.setOutput(.speaker) }
+        if needOverride { _ = try? audio.setOutput(.speaker) }
         await speaker.speak(text, language: language)
-        if needOverride { try? audio.setOutput(.preferred) }
+        if needOverride { _ = try? audio.setOutput(.preferred) }
         // 擴音播完後留一點時間，免得殘響被當成下一句。
         try? await Task.sleep(for: .milliseconds(toSpeaker ? 400 : 150))
         capture.segmenter.muted = false
