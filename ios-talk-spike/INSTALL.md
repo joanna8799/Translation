@@ -68,7 +68,8 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 
 ### C2. 手機端，只做一次
 
-1. iPhone 用傳輸線接電腦，手機上按「信任這部電腦」。開 iTunes，在裝置頁勾「透過 Wi-Fi 與此 iPhone 同步」，之後續簽才能不接線。
+1. iPhone 用傳輸線接電腦，手機上按「信任這部電腦」。iTunes 若跳出來，關掉即可。
+   （「透過 Wi-Fi 同步」不是必要的：接著線 AltServer 就能透過 USB 跟手機通訊。只有想每週不接線自動續簽、而且電腦和手機在同一個 Wi-Fi 時才需要勾。）
 2. 系統匣右鍵 AltServer 圖示 > **Install AltStore** > 選你的 iPhone > 輸入 Apple ID 與密碼（會要兩步驟驗證碼）。
 3. 手機上出現 AltStore，但還不能開。到 設定 > 一般 > VPN 與裝置管理 > 點你的 Apple ID > **信任**。
 4. 設定 > 隱私權與安全性 > **開發者模式** 打開，手機會重開機。（這個選項要裝過非 App Store 的 app 才會出現，做完第 2 步再去找。）
@@ -78,13 +79,19 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 
 1. 手機上用 **Safari** 開上面那個固定網址，下載 `.ipa`（檔案會進「檔案」app 的下載項目）。
 2. 開 AltStore > My Apps > 左上角「+」> 選剛下載的 `TalkSpike-unsigned.ipa`。AltStore 會簽章並安裝，約 30 秒到 1 分鐘。
-   做這一步時手機和電腦要在同一個 Wi-Fi，而且電腦上的 AltServer 要開著（簽章是電腦做的）。
+   做這一步時電腦上的 AltServer 要開著（簽章是電腦做的），手機要能連到 AltServer：**用傳輸線接著就可以**，不需要同一個 Wi-Fi。
 3. 第一次開 TalkSpike 會要麥克風權限，允許。
 4. 之後有新 commit 推上去，重複 1 到 2，直接覆蓋安裝，之前的量測紀錄會留著。
 
 ### C4. 讓它不過期
 
-每 7 天要續簽。AltStore 的做法：手機和電腦在同一個 Wi-Fi、AltServer 開著，AltStore 會在背景自動續；不放心就開 AltStore > My Apps 按 **Refresh All**。到期的 app 圖示還在但打不開，續簽後資料不會掉。
+每 7 天要續簽，三種方式擇一：
+
+- **接線**：手機接電腦、AltServer 開著，開 AltStore > My Apps 按 **Refresh All**，30 秒。電腦和手機不必在同一個 Wi-Fi。
+- **同一 Wi-Fi 自動續**：iTunes 裝置頁勾「透過 Wi-Fi 同步」，之後手機和電腦在同一個 Wi-Fi 且 AltServer 開著時，AltStore 會在背景自動續。
+- **手機熱點**：電腦連上 iPhone 的個人熱點，兩者就在同一個網路，再按 Refresh All。
+
+到期的 app 圖示還在但打不開，續簽後資料不會掉。
 
 ### 另一個選擇：Sideloadly
 
