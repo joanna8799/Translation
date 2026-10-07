@@ -1,25 +1,67 @@
 import Foundation
+import Network
 
 /// 匯率來源是 open.er-api.com 的免費端點（每天更新一次、不用金鑰、含 TWD）。
-/// 出發前連一次網抓下來存起來，旅途中離線用快取。
+/// 自動更新的時機：開 app、回到前景且快取超過 maxAge、網路從斷線恢復。離線時用快取。
 final class CurrencyConverter: ObservableObject {
     @Published var status = "尚未抓匯率"
+    @Published private(set) var fetchedAt: Date?
     private(set) var ratesPerUSD: [String: Double] = [:]
-    private(set) var fetchedAt: Date?
+
+    /// 超過這個時間就視為過期，回前景或網路恢復時重抓。免費來源一天更新一次，6 小時夠了。
+    var maxAge: TimeInterval = 6 * 3600
 
     private let cacheKey = "talkspike.rates"
     private let cacheDateKey = "talkspike.rates.date"
+    private let monitor = NWPathMonitor()
+    private var wasOnline = true
+    private var refreshing = false
 
     init() {
         if let data = UserDefaults.standard.data(forKey: cacheKey),
            let rates = try? JSONDecoder().decode([String: Double].self, from: data) {
             ratesPerUSD = rates
             fetchedAt = UserDefaults.standard.object(forKey: cacheDateKey) as? Date
-            status = "快取匯率 \(fetchedAt.map { Self.dateFormatter.string(from: $0) } ?? "")"
+            status = summaryText(prefix: "快取匯率")
         }
+        monitor.pathUpdateHandler = { [weak self] path in
+            guard let self else { return }
+            let online = path.status == .satisfied
+            let cameBack = online && !self.wasOnline
+            self.wasOnline = online
+            if cameBack { Task { await self.refreshIfStale() } }
+        }
+        monitor.start(queue: DispatchQueue(label: "talkspike.currency.network"))
+    }
+
+    var isStale: Bool {
+        guard let fetchedAt else { return true }
+        return Date().timeIntervalSince(fetchedAt) > maxAge
+    }
+
+    /// 過期才抓，給回前景與網路恢復用。
+    func refreshIfStale() async {
+        guard isStale else { return }
+        await refresh()
+    }
+
+    /// 給使用者看的一行：匯率值、幾小時前更新、來源。
+    func summaryText(prefix: String) -> String {
+        let twd = ratesPerUSD["TWD"].map { String(format: "TWD/USD %.2f", $0) } ?? "無資料"
+        let age: String
+        if let fetchedAt {
+            let hours = Int(Date().timeIntervalSince(fetchedAt) / 3600)
+            age = hours < 1 ? "剛更新" : "\(hours) 小時前更新"
+        } else {
+            age = "未更新"
+        }
+        return "\(prefix) \(twd)，\(age)，每 6 小時自動重抓"
     }
 
     func refresh() async {
+        guard !refreshing else { return }
+        refreshing = true
+        defer { refreshing = false }
         guard let url = URL(string: "https://open.er-api.com/v6/latest/USD") else { return }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
@@ -29,10 +71,10 @@ final class CurrencyConverter: ObservableObject {
             fetchedAt = Date()
             UserDefaults.standard.set(try JSONEncoder().encode(payload.rates), forKey: cacheKey)
             UserDefaults.standard.set(fetchedAt, forKey: cacheDateKey)
-            await MainActor.run { status = "匯率已更新 \(Self.dateFormatter.string(from: Date()))，TWD/USD \(String(format: "%.2f", payload.rates["TWD"] ?? 0))" }
+            await MainActor.run { status = summaryText(prefix: "匯率") }
             Metrics.shared.log("fx.refresh.ok", ["count": Double(payload.rates.count)])
         } catch {
-            await MainActor.run { status = "抓匯率失敗，用快取：\(error.localizedDescription)" }
+            await MainActor.run { status = summaryText(prefix: "離線，用快取匯率") }
             Metrics.shared.log("fx.refresh.error", [:], ["error": String(describing: error)])
         }
     }

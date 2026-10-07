@@ -44,7 +44,15 @@ struct SettingsSheet: View {
                     LabeledContent("語音模型") { Text(model.assetStatus).multilineTextAlignment(.trailing) }
                     LabeledContent("翻譯 外→中", value: model.toChinese.status)
                     LabeledContent("翻譯 中→外", value: model.toForeign.status)
-                    LabeledContent("匯率") { Text(model.currency.status).multilineTextAlignment(.trailing) }
+                }
+                .font(.subheadline)
+
+                Section("匯率") {
+                    Text(model.currency.status)
+                    Button("立即更新匯率") { Task { await model.currency.refresh() } }
+                    Text("來源 open.er-api.com，每天更新一次。開 app、回到前景超過 6 小時、網路恢復時會自動重抓；離線時用最後一次的快取，旅途中幾天內的誤差可忽略。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 .font(.subheadline)
 
