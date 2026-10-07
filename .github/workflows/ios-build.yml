@@ -110,6 +110,16 @@ jobs:
         run: |
           rm -rf Payload && mkdir Payload
           cp -R build/Build/Products/Release-iphoneos/TalkSpike.app Payload/
+          # 版本號直接寫進 Info.plist（app 未簽章，AltStore 會重簽，改 plist 沒問題），
+          # 再從同一個檔案讀回來產 altstore.json，AltStore 比對才不會對不上。
+          PLIST=Payload/TalkSpike.app/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $APP_VERSION" "$PLIST" \
+            || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string $APP_VERSION" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $APP_BUILD" "$PLIST" \
+            || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $APP_BUILD" "$PLIST"
+          APP_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$PLIST")
+          APP_BUILD=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST")
+          echo "Info.plist version=$APP_VERSION build=$APP_BUILD bundle=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$PLIST")"
           zip -qr TalkSpike-unsigned.ipa Payload
           cp App/Assets.xcassets/AppIcon.appiconset/icon-1024.png icon.png
           SIZE=$(stat -f%z TalkSpike-unsigned.ipa)
