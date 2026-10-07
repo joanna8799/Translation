@@ -53,14 +53,16 @@ AltStore 用你的免費 Apple ID 幫它簽章後裝到手機。限制：7 天�
 
 ### C1. 電腦端，只做一次
 
-1. 到 Apple 官網裝 **iTunes** 與 **iCloud**（Windows 版，一定要 Apple 官網的安裝檔，不能用 Microsoft Store 版，AltServer 認不到）：
-   https://support.apple.com/zh-tw/HT210384 （iTunes）、https://support.apple.com/zh-tw/HT204283 （iCloud）
-2. 到 https://altstore.io 下載 **AltStore Classic** 的 AltServer for Windows，解壓後執行 `Setup.exe`。裝好後系統匣會多一個 AltServer 圖示。
+1. 到 Apple 官網裝 **iTunes** 與 **iCloud**（Windows 版，一定要 Apple 官網的安裝檔，不能用 Microsoft Store 版，AltServer 認不到；已經裝了 Store 版的先解除安裝）：
+   - iTunes 64 位元直接下載：https://www.apple.com/itunes/download/win64 （Apple 的 iTunes 頁面在 Windows 10/11 上會把你導去 Microsoft Store，所以要用這個直接連結）
+   - iCloud：https://support.apple.com/zh-tw/HT204283 ，頁面上的「下載」按鈕
+2. 到 https://altstore.io 按 **Download AltServer for Windows**（AltStore Classic），解壓 `AltInstaller.zip` 後執行 `Setup.exe`。裝好後在 Windows 搜尋列打 AltServer，以系統管理員身分執行，系統匣會多一個圖示。
+   官方圖文步驟：https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows
 3. 建議另外申請一個專門拿來簽章的免費 Apple ID（不是必要，但簽章用的帳號會被 Apple 加上開發者相關的紀錄，用小號比較乾淨）。
 
 ### C2. 手機端，只做一次
 
-1. iPhone 用傳輸線接電腦，手機上按「信任這部電腦」。iTunes 若跳出來把它關掉就好。
+1. iPhone 用傳輸線接電腦，手機上按「信任這部電腦」。開 iTunes，在裝置頁勾「透過 Wi-Fi 與此 iPhone 同步」，之後續簽才能不接線。
 2. 系統匣右鍵 AltServer 圖示 > **Install AltStore** > 選你的 iPhone > 輸入 Apple ID 與密碼（會要兩步驟驗證碼）。
 3. 手機上出現 AltStore，但還不能開。到 設定 > 一般 > VPN 與裝置管理 > 點你的 Apple ID > **信任**。
 4. 設定 > 隱私權與安全性 > **開發者模式** 打開，手機會重開機。（這個選項要裝過非 App Store 的 app 才會出現，做完第 2 步再去找。）
