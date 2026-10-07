@@ -3,7 +3,7 @@
 目標：做一款像 EasyComix 那樣「在你原本的閱讀環境裡就地翻譯漫畫與小說」的產品，
 但採用沈浸式翻譯的鋪法：所有瀏覽器都能裝、手機上任何 app 內的內容都能翻。
 
-目前內容：評估文件（docs/）與 iOS 即時模式技術驗證專案（ios-spike/，Phase 0b，尚未在 Xcode 編譯過）。
+目前內容：評估文件（docs/）與 iOS 即時模式技術驗證專案（ios-spike/，Phase 0b）。兩個 iOS 專案都由 GitHub Actions 在 macOS runner 上用 Xcode 26 編譯（`.github/workflows/ios-build.yml`），目前編譯通過，尚未實機驗證。
 另附一份獨立的旅行即時對話翻譯評估（docs/07）與對應的技術驗證專案（ios-talk-spike/），回答「出國時用 iPhone 加一般耳機自己做即時口譯」怎麼做。
 
 ## 文件索引

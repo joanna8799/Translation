@@ -8,6 +8,7 @@ on:
       - "ios-spike/**"
       - "ios-talk-spike/**"
       - ".github/workflows/ios-build.yml"
+      - "!**/*.md"
   workflow_dispatch:
 
 jobs:
@@ -51,6 +52,8 @@ jobs:
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" \
             build 2>&1 | tee build.log | grep -E "error:|warning: unre|BUILD|Compiling|\*\* " || true
+          echo "---- warnings (unique) ----"
+          grep -E "warning:" build.log | sed -E 's#^.*/(ios-[a-z-]+)/#\1/#' | sort -u || echo "no warnings"
           echo "---- errors ----"
           grep -E "error:" build.log || echo "no errors"
           grep -q "BUILD SUCCEEDED" build.log

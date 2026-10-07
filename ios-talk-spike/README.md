@@ -16,6 +16,8 @@ Apple 把即時翻譯鎖在自家耳機是產品決定，不是技術限制。�
 
 ## 這份程式碼的狀態
 
+**已用 Xcode 26.4.1 編譯通過（GitHub Actions macos-26 runner，iOS 模擬器 SDK，arm64 與 x86_64，零錯誤），尚未在實機上跑過。**
+
 這些檔案是在沒有 Xcode 的 Linux 環境裡寫的，本機沒辦法編譯 iOS 專案。補救的方式有兩個：
 
 1. **API 簽章逐一對照 Apple 官方文件的資料檔**（developer.apple.com 的文件 JSON），已確認：`SpeechTranscriber.init(locale:transcriptionOptions:reportingOptions:attributeOptions:)`、`ResultAttributeOption.transcriptionConfidence`、`AttributeScopes.SpeechAttributes.transcriptionConfidence`（值為 0 到 1）、`SpeechAnalyzer.analyzeSequence(_:) -> CMTime?`、`finalizeAndFinish(through: CMTime)`、`prepareToAnalyze(in: AVAudioFormat?)`、`AssetInventory.assetInstallationRequest(supporting:)`、`SpeechTranscriber.supportedLocale(equivalentTo:)`、`AVAudioSession.CategoryOptions.allowBluetoothA2DP` 與 `allowBluetoothHFP`。
