@@ -72,6 +72,10 @@ jobs:
     needs: build
     permissions:
       contents: write
+    # 同一時間只讓一個 job 動 release，避免兩次推送互相覆蓋。
+    concurrency:
+      group: talkspike-release
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode
@@ -162,9 +166,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete talkspike-latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create talkspike-latest TalkSpike-unsigned.ipa altstore.json icon.png \
-            --target "$GITHUB_SHA" \
-            --prerelease \
-            --title "TalkSpike 1.0.${{ github.run_number }}（未簽章）" \
-            --notes "自動產出，commit ${GITHUB_SHA:0:7}，分支 ${GITHUB_REF_NAME}。AltStore 來源網址：https://github.com/${GITHUB_REPOSITORY}/releases/download/talkspike-latest/altstore.json 。步驟見 ios-talk-spike/INSTALL.md。"
+          TITLE="TalkSpike 1.0.${{ github.run_number }}（未簽章）"
+          NOTES="自動產出，commit ${GITHUB_SHA:0:7}，分支 ${GITHUB_REF_NAME}。AltStore 來源網址：https://github.com/${GITHUB_REPOSITORY}/releases/download/talkspike-latest/altstore.json 。步驟見 ios-talk-spike/INSTALL.md。"
+          # 不刪除重建（偶爾會吃到 403），改成：已存在就覆蓋資產並把 tag 移到新 commit；不存在才建立。失敗重試三次。
+          for attempt in 1 2 3; do
+            if gh release view talkspike-latest >/dev/null 2>&1; then
+              gh release upload talkspike-latest TalkSpike-unsigned.ipa altstore.json icon.png --clobber \
+                && gh release edit talkspike-latest --prerelease --title "$TITLE" --notes "$NOTES" \
+                && git tag -f talkspike-latest "$GITHUB_SHA" \
+                && git push -f origin talkspike-latest \
+                && break
+            else
+              gh release create talkspike-latest TalkSpike-unsigned.ipa altstore.json icon.png \
+                --target "$GITHUB_SHA" --prerelease --title "$TITLE" --notes "$NOTES" \
+                && break
+            fi
+            echo "release step failed (attempt $attempt), retrying in 15s"
+            sleep 15
+            [ "$attempt" = 3 ] && exit 1
+          done
+          gh release view talkspike-latest --json assets --jq '.assets[] | "\(.name) \(.size) bytes"'
