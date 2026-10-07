@@ -4,7 +4,7 @@ import AVFoundation
 /// 音訊路徑是這個驗證專案最重要的一塊：
 /// - 輸出走藍牙 A2DP（或有線耳機），音質正常。
 /// - 輸入固定用 iPhone 內建麥克風收對方的聲音。耳機上的麥克風在你嘴邊，收不到對方。
-/// - 絕對不要加 .allowBluetooth（HFP）：一加系統就會改用耳機麥克風，整條音訊掉到電話音質（8 到 16 kHz）。
+/// - 絕對不要加 .allowBluetoothHFP（舊名 .allowBluetooth）：一加系統就會改用耳機麥克風，整條音訊掉到電話音質（8 到 16 kHz）。
 /// - 沒接耳機時 playAndRecord 預設從聽筒出聲，要改到擴音。
 /// - 「播給對方」時暫時把輸出切到擴音，播完切回耳機。
 final class AudioSessionManager {

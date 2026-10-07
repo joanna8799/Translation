@@ -1,0 +1,63 @@
+# 在 GitHub 的 macOS runner 上編譯兩個 iOS 技術驗證專案。
+# 這個 repo 是公開的，macOS runner 免費。只做編譯（模擬器 SDK、不簽章），不跑實機。
+name: iOS build
+
+on:
+  push:
+    paths:
+      - "ios-spike/**"
+      - "ios-talk-spike/**"
+      - ".github/workflows/ios-build.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dir: ios-talk-spike
+            project: TalkSpike.xcodeproj
+            scheme: TalkSpike
+          - dir: ios-spike
+            project: LiveSpike.xcodeproj
+            scheme: LiveSpike
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          ls /Applications | grep -i xcode || true
+          sudo xcode-select -s /Applications/Xcode_26.4.1.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        working-directory: ${{ matrix.dir }}
+        run: xcodegen generate
+
+      - name: Build (iOS Simulator, no signing)
+        working-directory: ${{ matrix.dir }}
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project "${{ matrix.project }}" \
+            -scheme "${{ matrix.scheme }}" \
+            -configuration Debug \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" \
+            build 2>&1 | tee build.log | grep -E "error:|warning: unre|BUILD|Compiling|\*\* " || true
+          echo "---- errors ----"
+          grep -E "error:" build.log || echo "no errors"
+          grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.dir }}-build-log
+          path: ${{ matrix.dir }}/build.log

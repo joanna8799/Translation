@@ -16,13 +16,12 @@ Apple 把即時翻譯鎖在自家耳機是產品決定，不是技術限制。�
 
 ## 這份程式碼的狀態
 
-這些檔案是在沒有 Xcode 的環境裡寫的，沒有編譯過。API 用法都對照過 Apple 文件與 WWDC25 的範例，但第一次在 Xcode 開一定有幾個要修的地方。最可能的三個：
+這些檔案是在沒有 Xcode 的 Linux 環境裡寫的，本機沒辦法編譯 iOS 專案。補救的方式有兩個：
 
-1. `Transcriber.swift` 裡取信心值的那一行 `run.transcriptionConfidence`。屬性名稱若不同，用 Xcode 自動完成在 `AttributeScopes.SpeechAttributes` 底下找。拿不到信心值也能跑，`LanguageDecider` 會退回文字啟發式，但項目 2 大概會不過。
-2. `analyzer.finalizeAndFinish(through:)` 的參數型別（`CMTime` 或 `CMTime?`）。
-3. `async let` 搭配會丟錯誤的函式，Swift 版本不同可能要求把 `try` 寫在宣告處。
+1. **API 簽章逐一對照 Apple 官方文件的資料檔**（developer.apple.com 的文件 JSON），已確認：`SpeechTranscriber.init(locale:transcriptionOptions:reportingOptions:attributeOptions:)`、`ResultAttributeOption.transcriptionConfidence`、`AttributeScopes.SpeechAttributes.transcriptionConfidence`（值為 0 到 1）、`SpeechAnalyzer.analyzeSequence(_:) -> CMTime?`、`finalizeAndFinish(through: CMTime)`、`prepareToAnalyze(in: AVAudioFormat?)`、`AssetInventory.assetInstallationRequest(supporting:)`、`SpeechTranscriber.supportedLocale(equivalentTo:)`、`AVAudioSession.CategoryOptions.allowBluetoothA2DP` 與 `allowBluetoothHFP`。
+2. **GitHub Actions 在 macOS runner 上編譯**：`.github/workflows/ios-build.yml` 每次推送都會用 Xcode 26 對模擬器 SDK 編譯這個專案（不簽章），編譯紀錄在 Actions 的 artifact 裡。編譯過了不代表能跑，五個驗證項目仍然要實機。
 
-修完請把 diff 丟回來。
+iOS 26 還多了兩個可以之後用上的 API：`TranslationSession(installedSource:target:)` 可以不經 SwiftUI 直接建翻譯 session（語言包已安裝時），iOS 26.4 的 `TranslationSession.Strategy.lowLatency` 是專門給即時對話的低延遲模型。目前先沿用 `TranslationBridge` 的做法，驗證過延遲再換。
 
 ## 架構
 

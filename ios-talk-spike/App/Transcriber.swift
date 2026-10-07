@@ -23,10 +23,9 @@ final class Transcriber {
 
     /// 確認語言模型在裝置上，沒有就下載；並預熱一次讓後面每段的 setup 變快。
     func prepare(locale: Locale) async throws -> String {
-        let supported = await SpeechTranscriber.supportedLocales
-        guard let matched = supported.first(where: { $0.identifier(.bcp47) == locale.identifier(.bcp47) })
-                ?? supported.first(where: { $0.language.languageCode == locale.language.languageCode }) else {
-            Metrics.shared.log("asr.unsupported", [:], ["locale": locale.identifier])
+        guard let matched = await SpeechTranscriber.supportedLocale(equivalentTo: locale) else {
+            let supported = await SpeechTranscriber.supportedLocales.map(\.identifier).joined(separator: ",")
+            Metrics.shared.log("asr.unsupported", [:], ["locale": locale.identifier, "supported": supported])
             throw TranscriberError.unsupportedLocale(locale.identifier)
         }
         let transcriber = SpeechTranscriber(locale: matched, transcriptionOptions: [], reportingOptions: [], attributeOptions: [.transcriptionConfidence])
