@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  packageNames 不在這裡寫死，由 ReaderAccessibilityService.onServiceConnected 依使用者勾選設定，
+  這樣沒勾的 app 事件根本不會送進服務。
+  flagIncludeNotImportantViews：部分閱讀器把正文 view 標成 not important，不開會漏字。
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/a11y_description"
+    android:accessibilityEventTypes="typeWindowContentChanged|typeViewScrolled|typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagRetrieveInteractiveWindows|flagReportViewIds|flagIncludeNotImportantViews"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="100"
+    android:settingsActivity="dev.readtrans.spike.MainActivity" />

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ReadTrans Spike</string>
+    <string name="a11y_label">ReadTrans Spike 讀字驗證</string>
+    <string name="a11y_description">讀取你勾選的閱讀 app 畫面上的小說文字，在裝置上翻譯後顯示在底部面板。只處理你勾選的 app，不儲存原文，不上傳任何內容。這是技術驗證版。</string>
+</resources>

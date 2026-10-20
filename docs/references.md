@@ -77,6 +77,19 @@
 - Cloudflare Workers 方案：https://www.cloudflare.com/plans/developer-platform/
 - Anthropic 價格：本工作階段載入的官方價目表（2026-06 快取），上線前請至 https://docs.anthropic.com 核對
 
+## Shinkansen 與內容保護機制（docs/08）
+
+- Shinkansen repo（ELv2，網頁、YouTube、EPUB/PDF/Word 翻譯擴充，Chrome/Firefox/macOS/iOS）：https://github.com/jimmysu0309/shinkansen
+- Elastic License 2.0：https://www.elastic.co/licensing/elastic-license
+- FLAG_SECURE 不影響無障礙服務（Nightwatch 2016，2020 更新）：https://wwws.nightwatchcybersecurity.com/2016/04/13/research-securing-android-applications-from-screen-capture/
+- FLAG_SECURE 範圍與繞過整理：https://ptkd.com/journal/flag-secure-screen-share-capture-bypass
+- View.setAccessibilityDataSensitive（API 34）：https://developer.android.com/reference/android/view/View#setAccessibilityDataSensitive(int)
+- TYPE_ACCESSIBILITY_OVERLAY：https://developer.android.com/reference/android/view/WindowManager.LayoutParams#TYPE_ACCESSIBILITY_OVERLAY
+- iOS secure text field 擋截圖與錄影（BytePlus 文件）：https://docs.byteplus.com/en/docs/byteplus-vos/docs-anti-screen-recording
+- Kakao Page：iPhone 可截圖、Android 被擋：https://x.com/CZi_ruha/status/1553766537110368256
+- Piccoma iPhone 截圖黑畫面與警告：https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q11307348611
+- ML Kit Translation Android：https://developers.google.com/ml-kit/language/translation/android
+
 ## 平台 app 鎖定內容與內容保護（docs/07）
 
 - Ridi 客服：網頁閱讀器功能（支援網路小說，提到可搭配瀏覽器翻譯）：https://ridihelp.ridibooks.com/support/solutions/articles/154000207690
