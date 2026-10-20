@@ -22,18 +22,20 @@ Xcode 版本：
 | 4 | 黑畫面偵測次數 | | | 見下表 |
 | 5 | 延遲中位數：OCR / IPC / 翻譯 / 端到端（ms） | | | |
 
-## 目標 app 錄影測試
+## 目標 app 錄影與截圖測試
 
-| app | 錄影時畫面 | OCR 有抓到文字 | 備註 |
-|---|---|---|---|
-| Kakao Page | | | |
-| Kakao Webtoon | | | |
-| Naver Series | | | |
-| Naver Webtoon | | | |
-| Piccoma | | | |
-| LINE Manga | | | |
-| Webtoon | | | |
-| Safari 網頁版（對照組） | | | |
+錄影測試之外，在每個 app 的閱讀畫面按一次系統截圖，看相簿裡是不是黑的。iOS 沒有官方 API 擋截圖，但 secure text field 圖層手法可以讓截圖變黑，這決定截圖捷徑能不能當備案（docs/07 §3）。
+
+| app | 錄影時畫面 | 截圖是否黑掉 | OCR 有抓到文字 | 備註 |
+|---|---|---|---|---|
+| Kakao Page | | | | |
+| Kakao Webtoon | | | | |
+| Naver Series | | | | |
+| Naver Webtoon | | | | |
+| Piccoma | | | | |
+| LINE Manga | | | | |
+| Webtoon | | | | |
+| Safari 網頁版（對照組） | | | | |
 
 ## OCR 品質印象
 

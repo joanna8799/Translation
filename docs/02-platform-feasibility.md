@@ -122,14 +122,14 @@ iOS 與 Android 真正的差別只有一個：Android 的即時翻譯畫在原�
 | 自家閱讀器（貼網址、匯入檔案） | 容易。Vision OCR 與 Translation framework 免費、端側 | 容易。ML Kit 同樣免費端側 |
 | 跨 app，每頁按一下（截圖捷徑） | 容易，EasyComix 主打。背面輕點、動作按鈕、Siri 觸發，翻好的整頁顯示在原 app 上方 | 容易，但 Android 通常直接做即時的 |
 | 跨 app，即時覆蓋 | 難。只能背景錄影加 PiP 字幕條，記憶體 50 MB，審核風險 | 容易。螢幕擷取加懸浮窗 |
-| 小說：讀其他 app 的文字 | 截圖後 OCR | AccessibilityService 直接讀 UI 樹的文字，不用 OCR |
+| 小說：讀其他 app 的文字 | 截圖後 OCR（app 用 secure 圖層手法時截圖會黑） | AccessibilityService 直接讀 UI 樹的文字，不用 OCR，而且 FLAG_SECURE 擋不住它（docs/07 §3） |
 
 EasyComix 做的是第一列加第二列，第三列只做了字幕條版。他選 iOS 先上的理由：Apple 免費送端側 OCR 與翻譯、機型單純、使用者付費意願高，而且截圖捷徑在 iOS 上的觸發方式（動作按鈕、背面輕點）比 Android 順手。
 
 對我們的意義：
 
 - 本專案要的是第三列「即時」。Android 直接做；iOS 走 EasyComix Live Captions 的路（廣播擷取加 PiP），是必做而不是選配，但要先做技術驗證。
-- 截圖捷徑成本低、風險低，而且是唯一在所有 app 上都能用的模式（內容保護擋不住 iOS 截圖），保留當備案。
+- 截圖捷徑成本低、風險低，而且是覆蓋面最廣的模式，保留當備案。但「內容保護擋不住 iOS 截圖」不完全對：iOS 沒有官方 API 擋截圖，卻有被串流與金融 app 廣泛使用的 secure text field 圖層手法，能讓截圖與錄影一起變黑。目標 app 有沒有用要逐一實測，見 ios-spike/RESULTS.md 與 docs/07 §3。
 - Android 的即時是就地覆蓋，這是 EasyComix 沒有的差異化。
 
 ## 6. 小說在 Android 多一條路：AccessibilityService

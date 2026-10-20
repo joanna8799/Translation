@@ -77,6 +77,18 @@
 - Cloudflare Workers 方案：https://www.cloudflare.com/plans/developer-platform/
 - Anthropic 價格：本工作階段載入的官方價目表（2026-06 快取），上線前請至 https://docs.anthropic.com 核對
 
+## 平台 app 鎖定內容與內容保護（docs/07）
+
+- Ridi 客服：網頁閱讀器功能（支援網路小說，提到可搭配瀏覽器翻譯）：https://ridihelp.ridibooks.com/support/solutions/articles/154000207690
+- Ridi 客服：PC 閱讀器使用方式：https://ridihelp.ridibooks.com/support/solutions/articles/154000204319
+- Namu Wiki：카카오페이지/문제점（專用行動閱讀器作品 PC 不可讀）：https://namu.wiki/w/카카오페이지/문제점
+- Namu Wiki：네이버 시리즈（PC 閱讀器 DRM）：https://en.namu.wiki/w/네이버%20시리즈
+- 截圖黑畫面與 FLAG_SECURE（含 Piccoma）：https://www.wakaran.net/en/articles/cant-take-screenshots-with-your-smartphone-screen-turns-blac
+- Android AccessibilityServiceInfoCompat：https://developer.android.com/reference/androidx/core/accessibilityservice/AccessibilityServiceInfoCompat
+- 沉浸式翻譯會員條款（Pro／Max 額度）：https://immersivetranslate.com/zh-Hant/docs/MEMBERSHIP-TERMS/
+- 沉浸式翻譯下載中心（v6.3.9）：https://immersive-translate.com/download/
+- 沉浸式翻譯 iOS app：https://apps.apple.com/tw/app/id6447957425
+
 ## 競品定價參考
 
 - Sumi（US$6.99/月，1,500 頁）：https://mangasumi.com/pricing
