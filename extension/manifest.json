@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "ReadTrans",
+  "version": "0.1.0",
+  "description": "打開漫畫或小說網頁就自動翻譯：小說雙語對照，漫畫把譯文畫回氣泡。辨識在你的瀏覽器裡做，只把文字送去翻譯。",
+  "default_locale": "zh_TW",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "offscreen",
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content/common.js",
+        "content/novel.js",
+        "content/manga.js",
+        "content/main.js"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "ReadTrans"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "vendor/tesseract/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

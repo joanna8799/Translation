@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-TW"><head><meta charset="utf-8"><title>ReadTrans 設定</title>
+<style>
+body{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;font-size:15px;color:#1f2328;background:#f6f4ef;margin:0;padding:20px}
+.wrap{max-width:640px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:20px;margin:0}
+section{background:#fff;border:1px solid #d9d5cc;border-radius:10px;padding:14px;display:grid;gap:10px}
+h2{font-size:15px;margin:0}
+label{display:grid;gap:4px;font-size:13px;color:#6b6f76}
+label.inline{display:flex;gap:8px;align-items:center;color:#1f2328;font-size:14px}
+input[type=text],input[type=password],select,textarea{font:inherit;padding:8px;border:1px solid #d9d5cc;border-radius:8px;background:#fff;width:100%;box-sizing:border-box}
+button{font:inherit;padding:10px 16px;border-radius:8px;border:0;background:#b23a2a;color:#fff;cursor:pointer;justify-self:start}
+.note{font-size:13px;color:#6b6f76;margin:0}
+.saved{color:#2e7d4f;font-size:13px}
+</style></head>
+<body><div class="wrap">
+<h1>ReadTrans 設定</h1>
+<section>
+  <h2>翻譯引擎</h2>
+  <label class="inline"><input type="radio" name="provider" value="gtx">Google 翻譯公開端點（免費、不用 key、品質普通）</label>
+  <label class="inline"><input type="radio" name="provider" value="gemini">Gemini（自備 API key，免費額度夠日常用，品質好）</label>
+  <label>Gemini API key<input type="password" id="geminiKey" placeholder="AIza…"></label>
+  <label>Gemini 模型<input type="text" id="geminiModel"></label>
+  <label class="inline"><input type="radio" name="provider" value="openai">OpenAI 相容端點（OpenAI、OpenRouter、Groq、Ollama，或之後我們自己的 proxy）</label>
+  <label>端點（到 /v1 為止）<input type="text" id="openaiBase"></label>
+  <label>API key<input type="password" id="openaiKey"></label>
+  <label>模型<input type="text" id="openaiModel"></label>
+  <p class="note">Gemini key 到 aistudio.google.com/api-keys 申請，免費。key 只存在這個瀏覽器裡，請求直接送到 Google。</p>
+</section>
+<section>
+  <h2>內容</h2>
+  <label class="inline"><input type="checkbox" id="novel">翻譯小說文字（雙語對照）</label>
+  <label class="inline"><input type="checkbox" id="manga">翻譯漫畫圖片（譯文畫回氣泡）</label>
+  <label>漫畫原文<select id="mangaLang"><option value="ja_vert">日文，直式（日漫）</option><option value="ja">日文，橫式</option><option value="ko">韓文（條漫）</option></select></label>
+  <label>目標語言<select id="target"><option value="zh-TW">繁體中文</option><option value="zh-CN">簡體中文</option><option value="en">English</option></select></label>
+  <label>詞彙表（一行一組「原文=譯名」，只對 Gemini 與 OpenAI 相容端點生效）<textarea id="glossary" rows="4"></textarea></label>
+</section>
+<section>
+  <h2>自動翻譯</h2>
+  <label class="inline"><input type="checkbox" id="autoAll">所有網站都自動翻譯（只對韓文、日文的段落與大圖動手）</label>
+  <label>只在這些網站自動（每行一個網域，autoAll 關閉時才看這個）<textarea id="autoHosts" rows="3"></textarea></label>
+  <label>這些網站永遠不翻（每行一個網域）<textarea id="offHosts" rows="3"></textarea></label>
+</section>
+<button id="save">儲存</button><span class="saved" id="saved"></span>
+</div><script src="options.js"></script></body></html>

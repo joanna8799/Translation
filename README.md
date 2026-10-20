@@ -15,7 +15,7 @@
 
 | 在哪裡測 | 拿什麼 | 怎麼用 |
 |---|---|---|
-| 電腦或手機的瀏覽器 | 網頁測試台 https://claude.ai/artifact/Txdncuy6fcMTjrFaWmQzs4 （原始碼 demo/web/readtrans-testbench.html） | 上傳漫畫頁或 Ridi、Kakao Page 的小說截圖，或貼文字。氣泡偵測與 OCR 在你的裝置上跑，翻譯由 Claude 做，不經任何伺服器。要在 claude.ai 裡開，第一次翻譯會問你是否允許用 Claude |
+| 電腦 Chrome／Edge／Brave，Android 的 Kiwi 或 Edge | **瀏覽器擴充**（沉浸式翻譯的鋪法）zip：https://github.com/joanna8799/Translation/releases/download/extension-latest/readtrans-extension.zip ，原始碼 extension/ | 裝好不用按任何東西：打開小說網頁自動出雙語，打開漫畫網頁自動把譯文畫回氣泡。預設用 Google 翻譯免費端點，設定裡可換 Gemini（免費 key）。已用 Playwright 驗證自動翻譯（extension/test/results/）。iOS Safari 版要用 Xcode 包成 app，排下一步 |
 | Android 手機 | APK https://github.com/joanna8799/Translation/releases/download/readtrans-spike-latest/readtrans-spike-debug.apk | 安裝後到無障礙設定開啟 ReadTrans Spike，打開 Ridi 或 Kakao Page 的小說，停兩秒，底部浮出中文。步驟見 android-spike/README.md |
 | iPhone（免費 Apple ID 加 AltStore） | LiveSpike .ipa https://github.com/joanna8799/Translation/releases/download/livespike-latest/LiveSpike-unsigned.ipa ；TalkSpike .ipa https://github.com/joanna8799/Translation/releases/download/talkspike-latest/TalkSpike-unsigned.ipa | AltStore 設定見 ios-talk-spike/INSTALL.md 的 C 路線；LiveSpike 的注意事項見 ios-spike/README.md。iPhone 上的 Ridi 先用網頁測試台：截圖後上傳到「小說截圖」分頁 |
 
@@ -33,7 +33,8 @@
 | [docs/08-requirements-inventory.md](docs/08-requirements-inventory.md) | 需求對照盤點：五項需求的覆蓋程度、統一分層表、平台 app 鎖定小說的四條路徑與驗證清單、沉浸式翻譯小說功能對照、路線圖調整、待決策 |
 | [docs/09-build-plan.md](docs/09-build-plan.md) | 建置計畫：iOS 截圖與「讀螢幕」會不會被內容保護擋的精確答案、各平台實測回報、用 Shinkansen 補網頁與檔案那一半、Android 與 iOS 到類別與 API 的設計、proxy 端點、六週交付表、本週實機要做的事 |
 | [docs/references.md](docs/references.md) | 所有參考來源 |
-| [demo/web/readtrans-testbench.html](demo/web/readtrans-testbench.html) | 網頁測試台原始碼：漫畫頁（像素法偵測、Tesseract OCR 或 Claude 看圖、擦字與直書橫書排版）、小說截圖雙語、貼文字翻譯 |
+| [extension/README.md](extension/README.md) | 瀏覽器擴充：安裝、三種翻譯引擎、漫畫限制、結構 |
+| [demo/web/readtrans-testbench.html](demo/web/readtrans-testbench.html) | （pipeline 測試工具，不是產品）網頁測試台原始碼：漫畫頁（像素法偵測、Tesseract OCR 或 Claude 看圖、擦字與直書橫書排版）、小說截圖雙語、貼文字翻譯 |
 | [demo/manga-pipeline/README.md](demo/manga-pipeline/README.md) | **已跑通的漫畫翻譯 pipeline**：測試頁 → 氣泡偵測 → OCR → LLM 翻譯 → 擦字排版，結果圖在 demo/manga-pipeline/results/ |
 | [android-spike/README.md](android-spike/README.md) | Android 無障礙讀字驗證專案：AccessibilityService 讀目標 app 文字節點、ML Kit 端側翻譯、底部面板、FLAG_SECURE 判定流程、結果記錄表 |
 | [ios-spike/README.md](ios-spike/README.md) | iOS 即時模式技術驗證專案：廣播擴充加 PiP 的最小實作、五項驗證的操作步驟、結果記錄表 |

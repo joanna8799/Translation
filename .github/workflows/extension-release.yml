@@ -1,0 +1,45 @@
+# 把 extension/ 打包成 zip 發到固定網址，手機（Kiwi、Edge Android）與電腦都從這裡抓：
+#   https://github.com/joanna8799/Translation/releases/download/extension-latest/readtrans-extension.zip
+name: Extension release
+
+on:
+  push:
+    paths:
+      - "extension/**"
+      - ".github/workflows/extension-release.yml"
+      - "!**/*.md"
+  workflow_dispatch:
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: extension-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check
+        run: |
+          for f in extension/background.js extension/offscreen/offscreen.js extension/content/*.js extension/popup/popup.js extension/options/options.js; do node --check "$f"; done
+          python3 -c "import json;json.load(open('extension/manifest.json'))"
+      - name: Zip
+        run: |
+          cd extension && zip -qr ../readtrans-extension.zip . -x 'test/*' -x '*.md' && cd .. && ls -la readtrans-extension.zip
+      - name: Publish to rolling pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="ReadTrans 擴充 0.1.${{ github.run_number }}"
+          NOTES="自動產出，commit ${GITHUB_SHA:0:7}。Chrome／Edge：解壓後在 chrome://extensions 載入未封裝項目。Android Kiwi／Edge：直接載入 zip。說明見 extension/README.md。"
+          for attempt in 1 2 3; do
+            if gh release view extension-latest >/dev/null 2>&1; then
+              gh release upload extension-latest readtrans-extension.zip --clobber \
+                && gh release edit extension-latest --prerelease --title "$TITLE" --notes "$NOTES" \
+                && git tag -f extension-latest "$GITHUB_SHA" && git push -f origin extension-latest && break
+            else
+              gh release create extension-latest readtrans-extension.zip --target "$GITHUB_SHA" --prerelease --title "$TITLE" --notes "$NOTES" && break
+            fi
+            sleep 15; [ "$attempt" = 3 ] && exit 1
+          done

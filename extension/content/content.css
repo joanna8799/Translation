@@ -1,0 +1,7 @@
+.rt-tr{display:block;margin:.25em 0 .7em;padding:.1em 0 .1em .6em;border-left:3px solid rgba(178,58,42,.75);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif;font-size:1em;line-height:1.7;color:inherit;
+  white-space:normal;word-break:break-word;text-align:left}
+.rt-overlay{position:absolute;z-index:2147483000;cursor:pointer;box-shadow:0 0 0 2px rgba(178,58,42,.6)}
+.rt-overlay canvas{display:block;width:100%;height:100%}
+.rt-overlay.rt-hidden{opacity:0}
+.rt-overlay.rt-hidden:hover{opacity:.08}
