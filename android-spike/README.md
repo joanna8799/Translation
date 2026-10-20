@@ -1,6 +1,6 @@
 # ReadTrans Spike：Android 無障礙讀字驗證
 
-對應 [docs/08-build-plan.md](../docs/08-build-plan.md) 第 3.1 節與第 7 節。這不是產品，只驗一件事：
+對應 [docs/09-build-plan.md](../docs/09-build-plan.md) 第 3.1 節與第 7 節。這不是產品，只驗一件事：
 
 **在 Naver Series、Kakao Page、Ridi、Piccoma、LINE Manga 這些 app 的小說畫面上，AccessibilityService 能不能直接讀到文字節點，以及該 app 有沒有 FLAG_SECURE。**
 

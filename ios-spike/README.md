@@ -13,7 +13,7 @@
 
 ## 這份程式碼的狀態
 
-這些檔案是在沒有 Xcode 的環境裡寫的，沒有編譯過。API 用法都對照過 Apple 文件，但第一次在 Xcode 開一定會有幾個要修的地方，預期是型別或簽章的小差異，不是架構問題。修完請把 diff 丟回來。
+這些檔案是在沒有 Xcode 的環境裡寫的。**已用 Xcode 26.4.1 在 GitHub Actions（macos-26 runner）對 iOS 模擬器 SDK 編譯通過，主 app 與廣播擴充兩個 target 都零錯誤**，見 `.github/workflows/ios-build.yml`。尚未在實機上跑過，五個驗證項目仍要真機。
 
 ## 架構
 

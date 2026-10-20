@@ -3,9 +3,13 @@
 目標：做一款像 EasyComix 那樣「在你原本的閱讀環境裡就地翻譯漫畫與小說」的產品，
 但採用沈浸式翻譯的鋪法：所有瀏覽器都能裝、手機上任何 app 內的內容都能翻。
 
-目前內容：漫畫翻譯 pipeline 示範（demo/manga-pipeline/，已在本環境跑通，有結果圖）、評估文件（docs/）、iOS 即時模式技術驗證專案（ios-spike/，Phase 0b，沒有 Xcode 無法編譯）、Android 無障礙讀字驗證專案（android-spike/，Phase 0c，**已編譯並組成可安裝的 APK**：android-spike/dist/readtrans-spike-debug.apk）。
+目前內容：
+- 漫畫翻譯 pipeline 示範（demo/manga-pipeline/，已在本環境跑通，有結果圖）。
+- 評估文件（docs/）。
+- iOS 即時模式技術驗證專案（ios-spike/，Phase 0b）與旅行即時口譯驗證專案（ios-talk-spike/，見 docs/09）。兩個 iOS 專案由 GitHub Actions 在 macOS runner 上用 Xcode 26 編譯（`.github/workflows/ios-build.yml`），編譯通過，尚未實機驗證。TalkSpike 的未簽章 .ipa 在 release `talkspike-latest`。
+- Android 無障礙讀字驗證專案（android-spike/，Phase 0c）。GitHub Actions 在 Ubuntu runner 上用正規 SDK 編譯（`.github/workflows/android-build.yml`），debug APK 在 release `readtrans-spike-latest`；本機無 SDK 時的替代流程 `android-spike/tools/build-without-sdk.sh` 也能組出同一個 APK（`android-spike/dist/`）。
 
-2026-10-20 依重申的五項需求重新盤點，結果在 [docs/07-requirements-inventory.md](docs/07-requirements-inventory.md)：需求 1、3、4 有缺口，其中「平台 app 鎖定的小說」應以 Android 無障礙讀字為主路徑，iOS 截圖並非在所有 app 都可用。
+2026-10-20 依重申的五項需求重新盤點，結果在 [docs/08-requirements-inventory.md](docs/08-requirements-inventory.md)：需求 1、3、4 有缺口，其中「平台 app 鎖定的小說」應以 Android 無障礙讀字為主路徑，iOS 截圖並非在所有 app 都可用。建置計畫在 [docs/09-build-plan.md](docs/09-build-plan.md)。
 
 ## 文件索引
 
@@ -17,12 +21,14 @@
 | [docs/04-roadmap.md](docs/04-roadmap.md) | MVP 路線圖與風險 |
 | [docs/05-novels.md](docs/05-novels.md) | 小說：三種來源的做法、token 計費的成本模型、小說專屬省錢手法 |
 | [docs/06-live-mode.md](docs/06-live-mode.md) | 即時模式（捲動自動更新）：Android 就地覆蓋與 iOS 廣播加 PiP 的完整設計、內容保護的限制、即時模式的成本控制、先做的技術驗證 |
-| [docs/07-requirements-inventory.md](docs/07-requirements-inventory.md) | 需求對照盤點：五項需求的覆蓋程度、統一分層表、平台 app 鎖定小說的四條路徑與驗證清單、沉浸式翻譯小說功能對照、路線圖調整、待決策 |
-| [docs/08-build-plan.md](docs/08-build-plan.md) | 建置計畫：iOS 截圖與「讀螢幕」會不會被內容保護擋的精確答案、各平台實測回報、用 Shinkansen 補網頁與檔案那一半、Android 與 iOS 到類別與 API 的設計、proxy 端點、六週交付表、本週實機要做的事 |
+| [docs/07-travel-conversation.md](docs/07-travel-conversation.md) | 旅行即時對話翻譯（與漫畫無關）：iPhone 17 無 AI 耳機的五種方案比較、設備需求、出發前設定步驟、幣值轉換、自製 app 的架構與工作量評估 |
+| [docs/08-requirements-inventory.md](docs/08-requirements-inventory.md) | 需求對照盤點：五項需求的覆蓋程度、統一分層表、平台 app 鎖定小說的四條路徑與驗證清單、沉浸式翻譯小說功能對照、路線圖調整、待決策 |
+| [docs/09-build-plan.md](docs/09-build-plan.md) | 建置計畫：iOS 截圖與「讀螢幕」會不會被內容保護擋的精確答案、各平台實測回報、用 Shinkansen 補網頁與檔案那一半、Android 與 iOS 到類別與 API 的設計、proxy 端點、六週交付表、本週實機要做的事 |
 | [docs/references.md](docs/references.md) | 所有參考來源 |
 | [demo/manga-pipeline/README.md](demo/manga-pipeline/README.md) | **已跑通的漫畫翻譯 pipeline**：測試頁 → 氣泡偵測 → OCR → LLM 翻譯 → 擦字排版，結果圖在 demo/manga-pipeline/results/ |
 | [android-spike/README.md](android-spike/README.md) | Android 無障礙讀字驗證專案：AccessibilityService 讀目標 app 文字節點、ML Kit 端側翻譯、底部面板、FLAG_SECURE 判定流程、結果記錄表 |
 | [ios-spike/README.md](ios-spike/README.md) | iOS 即時模式技術驗證專案：廣播擴充加 PiP 的最小實作、五項驗證的操作步驟、結果記錄表 |
+| [ios-talk-spike/README.md](ios-talk-spike/README.md) | 旅行即時口譯技術驗證專案：用一般耳機（不需 AirPods）做雙向語音翻譯，iOS 26 端側語音辨識加翻譯，五項驗證與結果記錄表 |
 
 ## 一頁結論
 

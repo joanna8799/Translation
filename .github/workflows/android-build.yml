@@ -1,0 +1,76 @@
+# 在 GitHub 的 Ubuntu runner 上用正規的 Android SDK 加 AGP 編譯 android-spike，產出 debug APK，
+# 並發佈到固定網址的 pre-release，手機上用瀏覽器就能直接下載安裝：
+#   https://github.com/joanna8799/Translation/releases/download/readtrans-spike-latest/readtrans-spike-debug.apk
+# 本機沒有 SDK 時的替代流程在 android-spike/tools/build-without-sdk.sh。
+name: Android build
+
+on:
+  push:
+    paths:
+      - "android-spike/**"
+      - ".github/workflows/android-build.yml"
+      - "!**/*.md"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: readtrans-spike-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Build debug APK (AGP, real SDK)
+        working-directory: android-spike
+        run: |
+          set -o pipefail
+          gradle --no-daemon assembleDebug 2>&1 | tee build.log | grep -E "warning:|w: |e: |error|BUILD" || true
+          grep -q "BUILD SUCCESSFUL" build.log
+          ls -la app/build/outputs/apk/debug/
+          cp app/build/outputs/apk/debug/app-debug.apk readtrans-spike-debug.apk
+
+      - name: Upload build log and APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-spike
+          path: |
+            android-spike/build.log
+            android-spike/readtrans-spike-debug.apk
+
+      - name: Publish APK to rolling pre-release
+        working-directory: android-spike
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="ReadTrans Spike 0.1.${{ github.run_number }}（debug）"
+          NOTES="自動產出，commit ${GITHUB_SHA:0:7}，分支 ${GITHUB_REF_NAME}。Android 無障礙讀字驗證，安裝與測試步驟見 android-spike/README.md。"
+          for attempt in 1 2 3; do
+            if gh release view readtrans-spike-latest >/dev/null 2>&1; then
+              gh release upload readtrans-spike-latest readtrans-spike-debug.apk --clobber \
+                && gh release edit readtrans-spike-latest --prerelease --title "$TITLE" --notes "$NOTES" \
+                && git tag -f readtrans-spike-latest "$GITHUB_SHA" \
+                && git push -f origin readtrans-spike-latest \
+                && break
+            else
+              gh release create readtrans-spike-latest readtrans-spike-debug.apk \
+                --target "$GITHUB_SHA" --prerelease --title "$TITLE" --notes "$NOTES" \
+                && break
+            fi
+            echo "release step failed (attempt $attempt), retrying in 15s"
+            sleep 15
+            [ "$attempt" = 3 ] && exit 1
+          done
+          gh release view readtrans-spike-latest --json assets --jq '.assets[] | "\(.name) \(.size) bytes"'

@@ -95,7 +95,7 @@ PiP 視窗（浮在任何 app 上，可拖曳、可雙指縮放）
 
 | | Android | iOS |
 |---|---|---|
-| app 能做什麼 | `FLAG_SECURE`：截圖與錄影都變黑畫面，無解；但無障礙服務讀文字節點不受影響（小說適用，docs/07 §3） | 沒有官方 API 擋截圖，但 secure text field 圖層手法可讓截圖與錄影都變黑；另可偵測 `isCaptured` 自己遮內容 |
+| app 能做什麼 | `FLAG_SECURE`：截圖與錄影都變黑畫面，無解；但無障礙服務讀文字節點不受影響（小說適用，docs/08 §3） | 沒有官方 API 擋截圖，但 secure text field 圖層手法可讓截圖與錄影都變黑；另可偵測 `isCaptured` 自己遮內容 |
 | 對即時模式的影響 | 該 app 完全不能用 | 該 app 在錄影時可能黑掉 |
 | 對截圖捷徑的影響 | 一樣不能用 | 多數 app 可用；用了 secure 圖層手法的 app 截圖是黑的，要逐 app 實測 |
 
