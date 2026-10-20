@@ -1,0 +1,518 @@
+<title>ReadTrans 測試台</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+KR:wght@400&display=swap">
+<style>
+/* Layout: one column tool page; controls on top, result canvas below, log at the bottom. */
+:root{
+  --bg:#f6f4ef; --fg:#1f2328; --muted:#6b6f76; --panel:#ffffff; --line:#d9d5cc;
+  --accent:#b23a2a; --accent-fg:#ffffff; --ok:#2e7d4f; --warn:#a86a00; --bad:#b23a2a;
+  --font-ui:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17191c; --fg:#e8e6e1; --muted:#9a9ea6; --panel:#202327; --line:#363a40;
+  --accent:#e0735f; --accent-fg:#1b1210; --ok:#6fcf97; --warn:#e3b341; --bad:#ff7b6b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17191c; --fg:#e8e6e1; --muted:#9a9ea6; --panel:#202327; --line:#363a40;
+  --accent:#e0735f; --accent-fg:#1b1210; --ok:#6fcf97; --warn:#e3b341; --bad:#ff7b6b; color-scheme:dark}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:900px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:20px;margin:0;font-weight:700;text-wrap:balance}
+h2{font-size:15px;margin:0 0 8px;font-weight:700}
+.sub{color:var(--muted);font-size:13px;margin:0}
+.status{display:flex;flex-wrap:wrap;gap:8px;font-size:12px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:var(--panel)}
+.chip.ok{border-color:var(--ok);color:var(--ok)} .chip.bad{border-color:var(--bad);color:var(--bad)} .chip.warn{border-color:var(--warn);color:var(--warn)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{background:var(--panel);border:1px solid var(--line);color:var(--fg);border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+select,input[type=file],textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+textarea{width:100%;min-height:140px;box-sizing:border-box;resize:vertical}
+.btn{background:var(--accent);color:var(--accent-fg);border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+.btn.secondary{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn:focus-visible,select:focus-visible,textarea:focus-visible,.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.canvasbox{overflow:auto;border:1px solid var(--line);border-radius:8px;background:#2a2a2a;max-height:75vh}
+canvas{display:block;max-width:100%;height:auto;margin:0 auto}
+.toggle{display:flex;gap:6px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{border-top:1px solid var(--line);padding:6px 4px;vertical-align:top;text-align:left}
+th{color:var(--muted);font-weight:500;font-size:12px}
+td.n{width:2em;color:var(--muted);font-variant-numeric:tabular-nums}
+.bi{display:grid;gap:8px}
+.bi .p{border-left:3px solid var(--line);padding:6px 10px;display:grid;gap:4px}
+.bi .src{color:var(--muted);font-size:13px}
+.bi .dst{font-size:16px}
+.log{font-family:var(--font-mono);font-size:12px;color:var(--muted);white-space:pre-wrap;max-height:160px;overflow:auto;margin:0}
+.note{font-size:13px;color:var(--muted)}
+.opts{display:flex;flex-wrap:wrap;gap:12px;font-size:13px}
+.opts label{display:flex;gap:6px;align-items:center}
+@media (prefers-reduced-motion:no-preference){.busy{animation:pulse 1.2s ease-in-out infinite}}
+@keyframes pulse{50%{opacity:.5}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>ReadTrans 測試台</h1>
+    <p class="sub">漫畫頁、小說截圖、貼上的文字，在手機或電腦的瀏覽器裡直接測：氣泡偵測與 OCR 在你的裝置上跑，翻譯交給 Claude。檔案不會上傳到任何伺服器。</p>
+  </header>
+  <div class="status" id="status">
+    <span class="chip" id="chipClaude">Claude：確認中</span>
+    <span class="chip" id="chipOCR">OCR 引擎：未載入</span>
+    <span class="chip" id="chipVision">看圖模式：確認中</span>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="manga" id="tabManga">漫畫頁</button>
+    <button role="tab" aria-selected="false" data-tab="novel" id="tabNovel">小說截圖</button>
+    <button role="tab" aria-selected="false" data-tab="text" id="tabText">貼文字</button>
+  </div>
+
+  <!-- 漫畫 -->
+  <section class="panel" id="paneManga">
+    <h2>漫畫頁：上傳一張頁面或截圖，翻好的頁面畫回氣泡</h2>
+    <div class="row">
+      <label class="f">頁面圖片<input type="file" id="mangaFile" accept="image/*"></label>
+      <label class="f">原文<select id="mangaLang">
+        <option value="ja_vert">日文，直式</option>
+        <option value="ja">日文，橫式</option>
+        <option value="ko">韓文</option>
+      </select></label>
+    </div>
+    <div class="opts">
+      <label><input type="radio" name="mangaMode" value="ocr" id="mangaModeOcr" checked>OCR 在瀏覽器（Tesseract），只送文字給 Claude</label>
+      <label><input type="radio" name="mangaMode" value="vision" id="mangaModeVision">把氣泡裁切交給 Claude 看圖（對照用，不走 OCR）</label>
+      <label><input type="checkbox" id="mangaQuality">高品質模型（較慢）</label>
+    </div>
+    <div class="row">
+      <button class="btn" id="mangaRun" disabled>偵測、辨識、翻譯</button>
+      <button class="btn secondary" id="mangaStop" disabled>停止</button>
+      <div class="toggle">
+        <button class="btn secondary" id="showOrig" disabled>看原圖</button>
+        <button class="btn secondary" id="showTrans" disabled>看譯圖</button>
+      </div>
+    </div>
+    <div class="canvasbox"><canvas id="mangaCanvas" width="10" height="10"></canvas></div>
+    <table id="mangaTable" hidden><thead><tr><th>#</th><th>OCR 原文</th><th>譯文</th><th>秒</th></tr></thead><tbody></tbody></table>
+    <p class="note">偵測用的是像素法（白、飽滿、夠大的區域），對白底有框的對話框準，對無框對白會漏。OCR 用 Tesseract 的 fast 模型，漫畫手寫體會錯，產品版換 manga-ocr。這兩個都是替身，流程與資料格式跟產品一樣。</p>
+  </section>
+
+  <!-- 小說截圖 -->
+  <section class="panel" id="paneNovel" hidden>
+    <h2>小說截圖：Ridi、Kakao Page、Naver Series 的閱讀畫面截圖，出雙語對照</h2>
+    <div class="row">
+      <label class="f">截圖<input type="file" id="novelFile" accept="image/*"></label>
+      <label class="f">原文<select id="novelLang">
+        <option value="ko">韓文</option>
+        <option value="ja">日文，橫式</option>
+        <option value="ja_vert">日文，直式</option>
+      </select></label>
+    </div>
+    <div class="opts">
+      <label><input type="radio" name="novelMode" value="ocr" id="novelModeOcr" checked>OCR 在瀏覽器（Tesseract），只送文字給 Claude</label>
+      <label><input type="radio" name="novelMode" value="vision" id="novelModeVision">整張截圖交給 Claude 看圖（對照用）</label>
+      <label><input type="checkbox" id="novelQuality">高品質模型（較慢）</label>
+    </div>
+    <div class="row">
+      <button class="btn" id="novelRun" disabled>辨識並翻譯</button>
+      <button class="btn secondary" id="novelStop" disabled>停止</button>
+    </div>
+    <div class="bi" id="novelOut"></div>
+    <p class="note">Android 上這一步由 app 的無障礙服務直接讀文字，不用 OCR；iOS 與這個網頁版只能走截圖。Ridi 的 iOS 版截圖可不可用，試一次就知道。</p>
+  </section>
+
+  <!-- 貼文字 -->
+  <section class="panel" id="paneText" hidden>
+    <h2>貼文字：網頁小說複製下來的段落</h2>
+    <textarea id="textIn" placeholder="貼上韓文或日文的段落，一段一行。"></textarea>
+    <div class="opts">
+      <label><input type="checkbox" id="textQuality">高品質模型（較慢）</label>
+      <label>詞彙表（可選，一行一組「原文=譯名」）</label>
+    </div>
+    <textarea id="glossary" style="min-height:60px" placeholder="예: 김서연=金瑞妍"></textarea>
+    <div class="row">
+      <button class="btn" id="textRun">翻譯</button>
+      <button class="btn secondary" id="textStop" disabled>停止</button>
+    </div>
+    <div class="bi" id="textOut"></div>
+  </section>
+
+  <section class="panel">
+    <h2>紀錄</h2>
+    <pre class="log" id="log"></pre>
+  </section>
+</div>
+
+<script src="tess/tesseract.min.js"></script>
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const logEl = $('log');
+function log(msg){ const t = new Date().toLocaleTimeString(); logEl.textContent += `[${t}] ${msg}\n`; logEl.scrollTop = logEl.scrollHeight; }
+
+// ---------- 分頁 ----------
+const panes = { manga: $('paneManga'), novel: $('paneNovel'), text: $('paneText') };
+document.querySelectorAll('.tabs [role=tab]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tabs [role=tab]').forEach(x => x.setAttribute('aria-selected', x === b ? 'true' : 'false'));
+  for (const k in panes) panes[k].hidden = k !== b.dataset.tab;
+  try { localStorage.setItem('rt.tab', b.dataset.tab); } catch (e) {}
+}));
+try { const t = localStorage.getItem('rt.tab'); if (t && panes[t]) document.querySelector(`[data-tab="${t}"]`).click(); } catch (e) {}
+
+// ---------- Claude ----------
+let sample = null, imageLimits = null;
+(async () => {
+  try { sample = await window.claude?.use('sample'); } catch (e) { sample = null; }
+  if (sample) {
+    $('chipClaude').textContent = 'Claude：可用'; $('chipClaude').className = 'chip ok';
+    try { const lim = await sample.limits(); imageLimits = lim.images || null; } catch (e) { imageLimits = null; }
+    $('chipVision').textContent = imageLimits ? `看圖模式：可用（一次最多 ${imageLimits.maxCount} 張）` : '看圖模式：這個檢視不能送圖';
+    $('chipVision').className = imageLimits ? 'chip ok' : 'chip warn';
+    if (!imageLimits) { $('mangaModeVision').disabled = true; $('novelModeVision').disabled = true; }
+  } else {
+    $('chipClaude').textContent = 'Claude：不可用（請在 claude.ai 裡開這一頁）'; $('chipClaude').className = 'chip bad';
+    $('chipVision').textContent = '看圖模式：不可用'; $('chipVision').className = 'chip bad';
+  }
+  $('mangaRun').disabled = !$('mangaFile').files.length; $('novelRun').disabled = !$('novelFile').files.length;
+})();
+const errCopy = {
+  not_granted: '你沒有允許這一頁使用 Claude。重新整理後再試一次會再問你。',
+  rate_limited: '呼叫太頻繁或用量到上限，等一下再試。',
+  refused: 'Claude 拒絕了這個內容。',
+  invalid_json: '回覆不是合法 JSON，再按一次。',
+  images_unavailable: '這個檢視不能送圖片，改用 OCR 模式。',
+  image_rejected: '圖片格式或大小不被接受。',
+  cancelled: '已停止。',
+};
+function copyFor(e){ return (e && errCopy[e.code]) || `翻譯失敗（${e && e.code || '未知'}）：${e && e.message || ''}`; }
+
+// ---------- OCR ----------
+const base = new URL('.', document.baseURI).href;
+let worker = null, workerLangs = '';
+function langsFor(mode){ return mode === 'ko' ? ['kor'] : mode === 'ja_vert' ? ['jpn_vert'] : ['jpn']; }
+// 語言檔以 tess/lang/<lang>.wasm 的名字發佈（只有這類副檔名能發佈），
+// 先抓回來寫進 tesseract.js 讀的 IndexedDB 快取（idb-keyval：keyval-store / keyval），
+// 引擎啟動時就會從快取拿，不再去抓 .traineddata。
+function idbPut(key, value){
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('keyval-store');
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval');
+    req.onerror = () => rej(req.error);
+    req.onsuccess = () => { const db = req.result; const tx = db.transaction('keyval', 'readwrite'); tx.objectStore('keyval').put(value, key); tx.oncomplete = () => { db.close(); res(); }; tx.onerror = () => rej(tx.error); };
+  });
+}
+function idbHas(key){
+  return new Promise((res) => {
+    const req = indexedDB.open('keyval-store');
+    req.onupgradeneeded = () => req.result.createObjectStore('keyval');
+    req.onerror = () => res(false);
+    req.onsuccess = () => { const db = req.result; try { const r = db.transaction('keyval').objectStore('keyval').get(key); r.onsuccess = () => { db.close(); res(r.result !== undefined); }; r.onerror = () => { db.close(); res(false); }; } catch (e) { db.close(); res(false); } };
+  });
+}
+async function seedLang(lang){
+  const key = `rt/${lang}.traineddata`;
+  if (await idbHas(key)) return;
+  log(`抓語言檔 ${lang}…`);
+  const r = await fetch(base + `tess/lang/${lang}.wasm`);
+  if (!r.ok) throw new Error(`語言檔 ${lang} 抓不到（${r.status}）`);
+  const buf = new Uint8Array(await r.arrayBuffer());
+  await idbPut(key, buf);
+}
+async function getWorker(mode){
+  const langs = langsFor(mode); const key = langs.join('+');
+  if (worker && workerLangs === key) return worker;
+  if (worker) { try { await worker.terminate(); } catch (e) {} worker = null; }
+  $('chipOCR').textContent = `OCR 引擎：載入 ${key}…`; $('chipOCR').className = 'chip warn busy';
+  log(`載入 OCR 引擎與語言檔 ${key}（第一次約 10 MB，之後走快取）`);
+  for (const l of langs) await seedLang(l);
+  worker = await Tesseract.createWorker(langs, 1, {
+    workerPath: base + 'tess/worker.min.js',
+    corePath: base + 'tess/',
+    langPath: base + 'tess/lang/',
+    cachePath: 'rt',
+    cacheMethod: 'write',
+    gzip: false,
+    logger: m => { if (m.status && m.progress !== undefined && (m.progress === 0 || m.progress === 1)) log(`ocr: ${m.status}`); },
+  });
+  workerLangs = key;
+  $('chipOCR').textContent = `OCR 引擎：就緒（${key}）`; $('chipOCR').className = 'chip ok';
+  return worker;
+}
+async function ocrBlock(w, canvas, vertical, whole){
+  await w.setParameters({ tessedit_pageseg_mode: whole ? '3' : (vertical ? '5' : '6'), preserve_interword_spaces: '1' });
+  const { data } = await w.recognize(canvas);
+  return data;
+}
+function cleanText(t, mode){
+  t = t.replace(/[\\\/|<>_~^`]/g, '');
+  return mode.startsWith('ja') ? t.replace(/\s+/g, '') : t.replace(/[ \t]+/g, ' ').trim();
+}
+
+// ---------- 影像工具 ----------
+function loadImage(file){
+  return new Promise((res, rej) => { const u = URL.createObjectURL(file); const im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = rej; im.src = u; });
+}
+function makeCanvas(w, h){ const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+// 像素法氣泡偵測：白、飽滿、夠大的連通區域。回傳 {boxes:[{x,y,w,h}], labels, dw, dh, scale}
+function detectBubbles(img){
+  const maxW = 1100; const scale = Math.min(1, maxW / img.width);
+  const dw = Math.round(img.width * scale), dh = Math.round(img.height * scale);
+  const c = makeCanvas(dw, dh); const ctx = c.getContext('2d', { willReadFrequently: true }); ctx.drawImage(img, 0, 0, dw, dh);
+  const px = ctx.getImageData(0, 0, dw, dh).data;
+  let m = new Uint8Array(dw * dh);
+  for (let i = 0, j = 0; i < px.length; i += 4, j++) { const l = (px[i] * 299 + px[i + 1] * 587 + px[i + 2] * 114) / 1000; m[j] = l > 235 ? 1 : 0; }
+  // closing：膨脹兩次再侵蝕兩次，把文字造成的洞補起來
+  const dil = (a) => { const o = new Uint8Array(a.length); for (let y = 0; y < dh; y++) for (let x = 0; x < dw; x++) { const i = y * dw + x; if (a[i]) { o[i] = 1; continue; } let v = 0; for (let yy = Math.max(0, y - 1); yy <= Math.min(dh - 1, y + 1) && !v; yy++) for (let xx = Math.max(0, x - 1); xx <= Math.min(dw - 1, x + 1); xx++) if (a[yy * dw + xx]) { v = 1; break; } o[i] = v; } return o; };
+  const ero = (a) => { const o = new Uint8Array(a.length); for (let y = 0; y < dh; y++) for (let x = 0; x < dw; x++) { const i = y * dw + x; if (!a[i]) continue; let v = 1; for (let yy = Math.max(0, y - 1); yy <= Math.min(dh - 1, y + 1) && v; yy++) for (let xx = Math.max(0, x - 1); xx <= Math.min(dw - 1, x + 1); xx++) if (!a[yy * dw + xx]) { v = 0; break; } o[i] = v; } return o; };
+  m = ero(ero(dil(dil(m))));
+  // 連通區域
+  const labels = new Int32Array(dw * dh); let n = 0; const stats = [];
+  const stack = new Int32Array(dw * dh);
+  for (let s = 0; s < m.length; s++) {
+    if (!m[s] || labels[s]) continue;
+    n++; let sp = 0; stack[sp++] = s; labels[s] = n;
+    let minx = dw, miny = dh, maxx = 0, maxy = 0, area = 0;
+    while (sp) { const i = stack[--sp]; const y = (i / dw) | 0, x = i - y * dw; area++;
+      if (x < minx) minx = x; if (x > maxx) maxx = x; if (y < miny) miny = y; if (y > maxy) maxy = y;
+      if (x > 0 && m[i - 1] && !labels[i - 1]) { labels[i - 1] = n; stack[sp++] = i - 1; }
+      if (x < dw - 1 && m[i + 1] && !labels[i + 1]) { labels[i + 1] = n; stack[sp++] = i + 1; }
+      if (y > 0 && m[i - dw] && !labels[i - dw]) { labels[i - dw] = n; stack[sp++] = i - dw; }
+      if (y < dh - 1 && m[i + dw] && !labels[i + dw]) { labels[i + dw] = n; stack[sp++] = i + dw; } }
+    stats.push({ label: n, x: minx, y: miny, w: maxx - minx + 1, h: maxy - miny + 1, area });
+  }
+  const pageArea = dw * dh; const boxes = [];
+  for (const s of stats) {
+    if (s.area < pageArea * 0.002 || s.area > pageArea * 0.15) continue;
+    const fill = s.area / (s.w * s.h), aspect = s.w / s.h;
+    if (fill < 0.55 || aspect < 0.2 || aspect > 6.5) continue;
+    if (s.x <= 2 || s.y <= 2 || s.x + s.w >= dw - 2 || s.y + s.h >= dh - 2) continue;
+    boxes.push(s);
+  }
+  boxes.sort((a, b) => ((a.y / 150) | 0) - ((b.y / 150) | 0) || b.x - a.x);
+  boxes.forEach((b, i) => b.id = i);
+  return { boxes, labels, dw, dh, scale };
+}
+// 乾淨裁切：遮罩外塗白、去框線，放大到至少 2 倍
+function bubbleCrop(img, det, b){
+  const inv = 1 / det.scale; const x = Math.round(b.x * inv), y = Math.round(b.y * inv), w = Math.round(b.w * inv), h = Math.round(b.h * inv);
+  const up = Math.max(1, Math.min(3, Math.round(900 / Math.max(w, h))));
+  const c = makeCanvas(w * up, h * up); const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, x, y, w, h, 0, 0, w * up, h * up);
+  const id = ctx.getImageData(0, 0, c.width, c.height); const d = id.data;
+  const er = 6; // 遮罩內縮像素（偵測尺度）
+  for (let yy = 0; yy < c.height; yy++) for (let xx = 0; xx < c.width; xx++) {
+    const dx = b.x + Math.floor(xx / up * det.scale), dy = b.y + Math.floor(yy / up * det.scale);
+    let inside = true;
+    for (let k = -er; k <= er && inside; k += er) for (let l = -er; l <= er; l += er) { const px = dx + k, py = dy + l; if (px < 0 || py < 0 || px >= det.dw || py >= det.dh || det.labels[py * det.dw + px] !== b.label) { inside = false; break; } }
+    if (!inside) { const i = (yy * c.width + xx) * 4; d[i] = d[i + 1] = d[i + 2] = 255; }
+  }
+  ctx.putImageData(id, 0, 0);
+  return { canvas: c, x, y, w, h };
+}
+
+// ---------- 排版 ----------
+const VERT = { '，': '︐', '。': '︒', '！': '︕', '？': '︖', '、': '︑', '：': '︓', '；': '︔', '「': '﹁', '」': '﹂', '『': '﹃', '』': '﹄', '（': '︵', '）': '︶', '…': '︙', '—': '︱' };
+const NOSTART = '，。！？、：；」』）…';
+function fitHorizontal(ctx, text, bw, bh){
+  for (let size = 36; size >= 12; size -= 2) {
+    ctx.font = `${size}px "Noto Sans TC","Noto Sans KR",sans-serif`;
+    let lines = [], cur = '';
+    for (const ch of text) { if (cur && ctx.measureText(cur + ch).width > bw && !NOSTART.includes(ch)) { lines.push(cur); cur = ch; } else cur += ch; }
+    lines.push(cur);
+    const lh = Math.round(size * 1.25);
+    if (lines.length * lh <= bh && lines.every(l => ctx.measureText(l).width <= bw)) {
+      if (lines.length > 1) { const per = Math.ceil(text.length / lines.length); const bal = []; for (let i = 0; i < text.length; i += per) bal.push(text.slice(i, i + per));
+        for (let i = 1; i < bal.length; i++) while (bal[i] && NOSTART.includes(bal[i][0])) { bal[i - 1] += bal[i][0]; bal[i] = bal[i].slice(1); }
+        const b2 = bal.filter(Boolean); if (b2.every(l => ctx.measureText(l).width <= bw)) lines = b2; }
+      return { size, lines, lh };
+    }
+  }
+  return { size: 12, lines: [text], lh: 15 };
+}
+function fitVertical(text, bw, bh){
+  text = [...text].map(c => VERT[c] || c).join('');
+  for (let size = 40; size >= 12; size -= 2) {
+    const colW = Math.round(size * 1.3), chH = Math.round(size * 1.1), per = Math.max(1, Math.floor(bh / chH));
+    const cols = []; for (let i = 0; i < text.length; i += per) cols.push(text.slice(i, i + per));
+    if (cols.length * colW <= bw) return { size, cols, colW, chH };
+  }
+  const size = 12, colW = 16, chH = 13, per = Math.max(1, Math.floor(bh / chH)); const cols = []; for (let i = 0; i < text.length; i += per) cols.push(text.slice(i, i + per));
+  return { size, cols, colW, chH };
+}
+function renderTranslated(img, det, items, vertical){
+  const c = makeCanvas(img.width, img.height); const ctx = c.getContext('2d', { willReadFrequently: true }); ctx.drawImage(img, 0, 0);
+  const id = ctx.getImageData(0, 0, c.width, c.height); const d = id.data; const inv = 1 / det.scale;
+  // 擦字：遮罩內填紙色
+  for (const it of items) {
+    const b = it.box; const x = Math.round(b.x * inv), y = Math.round(b.y * inv), w = Math.round(b.w * inv), h = Math.round(b.h * inv);
+    let r = 0, g = 0, bl = 0, cnt = 0;
+    for (let yy = y; yy < y + h; yy += 3) for (let xx = x; xx < x + w; xx += 3) { const dx = Math.floor(xx * det.scale), dy = Math.floor(yy * det.scale); if (det.labels[dy * det.dw + dx] === b.label) { const i = (yy * c.width + xx) * 4; if (d[i] > 200) { r += d[i]; g += d[i + 1]; bl += d[i + 2]; cnt++; } } }
+    if (!cnt) continue; r = Math.round(r / cnt); g = Math.round(g / cnt); bl = Math.round(bl / cnt);
+    const inset = Math.round(Math.min(w, h) * 0.08);
+    for (let yy = y + inset; yy < y + h - inset; yy++) for (let xx = x + inset; xx < x + w - inset; xx++) { const dx = Math.floor(xx * det.scale), dy = Math.floor(yy * det.scale); if (det.labels[dy * det.dw + dx] === b.label) { const i = (yy * c.width + xx) * 4; d[i] = r; d[i + 1] = g; d[i + 2] = bl; } }
+  }
+  ctx.putImageData(id, 0, 0);
+  ctx.fillStyle = '#111'; ctx.textBaseline = 'top';
+  for (const it of items) {
+    const t = (it.translated || '').trim(); if (!t) continue;
+    const b = it.box; const x = b.x * inv, y = b.y * inv, w = b.w * inv, h = b.h * inv;
+    const iw = w * 0.7, ih = h * 0.7, cx = x + w / 2, cy = y + h / 2;
+    if (vertical) {
+      const f = fitVertical(t, iw, ih); ctx.font = `${f.size}px "Noto Sans TC",sans-serif`;
+      const totalW = f.cols.length * f.colW; const right = cx + totalW / 2;
+      f.cols.forEach((col, ci) => { const xx = right - (ci + 1) * f.colW + (f.colW - f.size) / 2; let yy = cy - (col.length * f.chH) / 2; for (const ch of col) { ctx.fillText(ch, xx, yy); yy += f.chH; } });
+    } else {
+      const f = fitHorizontal(ctx, t, iw, ih); let yy = cy - (f.lines.length * f.lh) / 2;
+      for (const line of f.lines) { const lw = ctx.measureText(line).width; ctx.fillText(line, cx - lw / 2, yy); yy += f.lh; }
+    }
+  }
+  return c;
+}
+
+// ---------- 翻譯提示 ----------
+function glossaryText(){ const g = $('glossary').value.trim(); return g ? `\n詞彙表（務必採用）：\n${g}\n` : ''; }
+function langName(mode){ return mode === 'ko' ? '韓文' : '日文'; }
+function translatePrompt(mode, chunks){
+  return `你是漫畫與小說翻譯。把下面每一段${langName(mode)}原文翻成台灣繁體中文，口語、簡短、符合對話語氣；原文是 OCR 結果，可能有錯字、漏字或多字，依上下文推測原意。人名音譯要前後一致。${glossaryText()}
+只回傳 JSON：{"items":[{"id":0,"text":"譯文"}]}，id 與輸入一一對應，不要解釋。
+
+輸入：
+${JSON.stringify({ items: chunks.map(c => ({ id: c.id, text: c.text })) })}`;
+}
+function visionPrompt(mode, n){
+  return `這些圖片依序是漫畫頁上第 0 到 ${n - 1} 個對話框的裁切，裡面是${langName(mode)}。請逐張讀出原文並翻成台灣繁體中文（口語、簡短）。${glossaryText()}
+只回傳 JSON：{"items":[{"id":0,"text":"原文","translated":"譯文"}]}，id 是圖片順序，從 0 開始，每張一筆，不要解釋。`;
+}
+function visionPagePrompt(mode){
+  return `這是一張小說閱讀 app 的截圖，正文是${langName(mode)}。請把正文逐段讀出（忽略狀態列、標題列、按鈕與頁碼），每段翻成台灣繁體中文。${glossaryText()}
+只回傳 JSON：{"items":[{"id":0,"text":"原文段落","translated":"譯文"}]}，依閱讀順序，不要解釋。`;
+}
+function tier(cb){ return cb.checked ? 'default' : 'quick'; }
+
+// ---------- 漫畫流程 ----------
+let mangaImg = null, mangaOrig = null, mangaResult = null, mangaCtl = null;
+$('mangaFile').addEventListener('change', async () => {
+  const f = $('mangaFile').files[0]; if (!f) return;
+  mangaImg = await loadImage(f); mangaOrig = makeCanvas(mangaImg.width, mangaImg.height); mangaOrig.getContext('2d').drawImage(mangaImg, 0, 0);
+  showCanvas(mangaOrig); $('mangaRun').disabled = !sample; $('showOrig').disabled = false; $('showTrans').disabled = true; $('mangaTable').hidden = true;
+  log(`載入 ${f.name}，${mangaImg.width}×${mangaImg.height}`);
+});
+function showCanvas(src){ const c = $('mangaCanvas'); c.width = src.width; c.height = src.height; c.getContext('2d').drawImage(src, 0, 0); }
+$('showOrig').onclick = () => mangaOrig && showCanvas(mangaOrig);
+$('showTrans').onclick = () => mangaResult && showCanvas(mangaResult);
+$('mangaStop').onclick = () => mangaCtl && mangaCtl.abort();
+$('mangaRun').onclick = async () => {
+  if (!mangaImg || !sample) return;
+  const mode = $('mangaLang').value, vertical = mode === 'ja_vert', useVision = $('mangaModeVision').checked;
+  mangaCtl = new AbortController(); $('mangaRun').disabled = true; $('mangaStop').disabled = false;
+  const tbody = $('mangaTable').querySelector('tbody'); tbody.innerHTML = ''; $('mangaTable').hidden = false;
+  try {
+    const t0 = performance.now();
+    const det = detectBubbles(mangaImg);
+    log(`氣泡偵測：${det.boxes.length} 個，${Math.round(performance.now() - t0)} ms`);
+    if (!det.boxes.length) { log('沒有偵測到對話框。像素法只認白底、有框、夠大的氣泡。'); return; }
+    const items = det.boxes.map(b => ({ id: b.id, box: b, text: '', translated: '', ms: 0 }));
+    const row = it => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="n">${it.id}</td><td></td><td></td><td class="n"></td>`; tbody.appendChild(tr); return tr; };
+    const rows = items.map(row);
+    if (useVision) {
+      const crops = items.map(it => bubbleCrop(mangaImg, det, it.box).canvas);
+      const blobs = await Promise.all(crops.map(c => new Promise(r => c.toBlob(r, 'image/png'))));
+      const per = Math.max(1, imageLimits ? imageLimits.maxCount : 1);
+      for (let s = 0; s < items.length; s += per) {
+        if (mangaCtl.signal.aborted) throw { code: 'cancelled' };
+        const slice = items.slice(s, s + per); log(`Claude 看圖：第 ${s} 到 ${s + slice.length - 1} 個氣泡`);
+        const t1 = performance.now();
+        const out = await sample.json(visionPrompt(mode, slice.length), { images: blobs.slice(s, s + per), modelTier: tier($('mangaQuality')), signal: mangaCtl.signal });
+        const got = (out && out.items) || [];
+        got.forEach((g, i) => { const it = slice[i]; if (!it) return; it.text = String(g.text || ''); it.translated = String(g.translated || ''); it.ms = Math.round((performance.now() - t1) / slice.length); });
+        slice.forEach(it => { const tr = rows[it.id]; tr.children[1].textContent = it.text; tr.children[2].textContent = it.translated; tr.children[3].textContent = (it.ms / 1000).toFixed(1); });
+      }
+    } else {
+      const w = await getWorker(mode);
+      for (const it of items) {
+        if (mangaCtl.signal.aborted) throw { code: 'cancelled' };
+        const crop = bubbleCrop(mangaImg, det, it.box); const t1 = performance.now();
+        const data = await ocrBlock(w, crop.canvas, vertical, false);
+        it.text = cleanText(data.text, mode); it.ms = Math.round(performance.now() - t1);
+        rows[it.id].children[1].textContent = it.text || '（沒讀到）'; rows[it.id].children[3].textContent = (it.ms / 1000).toFixed(1);
+        log(`#${it.id} OCR ${it.ms} ms，信心 ${Math.round(data.confidence)}%：${it.text}`);
+      }
+      const chunks = items.filter(it => it.text);
+      if (chunks.length) {
+        log(`Claude 翻譯 ${chunks.length} 段…`);
+        const out = await sample.json(translatePrompt(mode, chunks), { modelTier: tier($('mangaQuality')), signal: mangaCtl.signal });
+        const map = new Map(((out && out.items) || []).map(g => [Number(g.id), String(g.text || '')]));
+        for (const it of items) { it.translated = map.get(it.id) || ''; rows[it.id].children[2].textContent = it.translated; }
+      }
+    }
+    await document.fonts.load('30px "Noto Sans TC"').catch(() => {});
+    mangaResult = renderTranslated(mangaImg, det, items, vertical); showCanvas(mangaResult); $('showTrans').disabled = false;
+    log(`完成，共 ${Math.round(performance.now() - t0)} ms`);
+  } catch (e) {
+    log(copyFor(e));
+  } finally { $('mangaRun').disabled = false; $('mangaStop').disabled = true; }
+};
+
+// ---------- 小說截圖流程 ----------
+let novelImg = null, novelCtl = null;
+$('novelFile').addEventListener('change', async () => { const f = $('novelFile').files[0]; if (!f) return; novelImg = await loadImage(f); $('novelRun').disabled = !sample; log(`載入 ${f.name}，${novelImg.width}×${novelImg.height}`); });
+$('novelStop').onclick = () => novelCtl && novelCtl.abort();
+function renderBilingual(el, items){
+  el.innerHTML = '';
+  for (const it of items) { const p = document.createElement('div'); p.className = 'p'; const s = document.createElement('div'); s.className = 'src'; s.textContent = it.text; const d = document.createElement('div'); d.className = 'dst'; d.textContent = it.translated || '…'; p.append(s, d); el.appendChild(p); }
+}
+$('novelRun').onclick = async () => {
+  if (!novelImg || !sample) return;
+  const mode = $('novelLang').value, useVision = $('novelModeVision').checked; novelCtl = new AbortController();
+  $('novelRun').disabled = true; $('novelStop').disabled = false; const out = $('novelOut'); out.innerHTML = '';
+  try {
+    if (useVision) {
+      const c = makeCanvas(novelImg.width, novelImg.height); c.getContext('2d').drawImage(novelImg, 0, 0);
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.9)); log('Claude 看圖讀整張截圖…');
+      const res = await sample.json(visionPagePrompt(mode), { images: [blob], modelTier: tier($('novelQuality')), signal: novelCtl.signal });
+      renderBilingual(out, ((res && res.items) || []).map((g, i) => ({ id: i, text: String(g.text || ''), translated: String(g.translated || '') })));
+    } else {
+      const w = await getWorker(mode); const t1 = performance.now();
+      const c = makeCanvas(novelImg.width, novelImg.height); c.getContext('2d').drawImage(novelImg, 0, 0);
+      const data = await ocrBlock(w, c, mode === 'ja_vert', true);
+      log(`OCR ${Math.round(performance.now() - t1)} ms，信心 ${Math.round(data.confidence)}%`);
+      // 段落：以 Tesseract 的 paragraphs 為準，沒有就用空行切
+      let paras = (data.paragraphs || []).map(p => cleanText(p.text, mode)).filter(t => t.length >= 2);
+      if (!paras.length) paras = cleanText(data.text, mode).split(/\n\s*\n/).map(t => t.replace(/\n/g, ' ').trim()).filter(Boolean);
+      const items = paras.map((t, i) => ({ id: i, text: t, translated: '' })); renderBilingual(out, items);
+      if (!items.length) { log('沒讀到文字。截圖裡字太小時可以先放大再截。'); return; }
+      log(`Claude 翻譯 ${items.length} 段…`);
+      const res = await sample.json(translatePrompt(mode, items), { modelTier: tier($('novelQuality')), signal: novelCtl.signal });
+      const map = new Map(((res && res.items) || []).map(g => [Number(g.id), String(g.text || '')]));
+      items.forEach(it => it.translated = map.get(it.id) || ''); renderBilingual(out, items);
+    }
+    log('完成');
+  } catch (e) { log(copyFor(e)); }
+  finally { $('novelRun').disabled = false; $('novelStop').disabled = true; }
+};
+
+// ---------- 貼文字 ----------
+let textCtl = null; $('textStop').onclick = () => textCtl && textCtl.abort();
+$('textRun').onclick = async () => {
+  if (!sample) { log('這個檢視沒有 Claude，請在 claude.ai 裡開這一頁。'); return; }
+  const lines = $('textIn').value.split(/\n+/).map(s => s.trim()).filter(Boolean); if (!lines.length) return;
+  const sample0 = lines.join(''); const hangul = (sample0.match(/[가-힣]/g) || []).length; const mode = hangul * 10 >= sample0.length * 3 ? 'ko' : 'ja';
+  const items = lines.map((t, i) => ({ id: i, text: t, translated: '' })); renderBilingual($('textOut'), items);
+  textCtl = new AbortController(); $('textRun').disabled = true; $('textStop').disabled = false;
+  try {
+    log(`Claude 翻譯 ${items.length} 段（判定為${langName(mode)}）…`);
+    const res = await sample.json(translatePrompt(mode, items), { modelTier: tier($('textQuality')), signal: textCtl.signal });
+    const map = new Map(((res && res.items) || []).map(g => [Number(g.id), String(g.text || '')]));
+    items.forEach(it => it.translated = map.get(it.id) || ''); renderBilingual($('textOut'), items); log('完成');
+  } catch (e) { log(copyFor(e)); }
+  finally { $('textRun').disabled = false; $('textStop').disabled = true; }
+};
+})();
+</script>
