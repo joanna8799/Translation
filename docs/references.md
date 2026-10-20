@@ -90,7 +90,7 @@
 - Piccoma iPhone 截圖黑畫面與警告：https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q11307348611
 - ML Kit Translation Android：https://developers.google.com/ml-kit/language/translation/android
 
-## 平台 app 鎖定內容與內容保護（docs/09）
+## 平台 app 鎖定內容與內容保護（docs/08）
 
 - Ridi 客服：網頁閱讀器功能（支援網路小說，提到可搭配瀏覽器翻譯）：https://ridihelp.ridibooks.com/support/solutions/articles/154000207690
 - Ridi 客服：PC 閱讀器使用方式：https://ridihelp.ridibooks.com/support/solutions/articles/154000204319
@@ -110,7 +110,7 @@
 - 2026 漫畫翻譯工具比較（Pawaka Labs）：https://pawakalabs.com/2026/03/01/best-tools-to-translate-manga-in-2026-tested-and-ranked/
 - 2026 漫畫翻譯工具比較（KitsuTL）：https://www.kitsutl.com/blog/manga-translation-tools-comparison-2026
 
-## 旅行即時對話翻譯（docs/09）
+## 旅行即時對話翻譯（docs/07）
 
 - Apple 翻譯 app（App Store）：https://apps.apple.com/app/translate/id1514844618
 - Apple 支援：用 AirPods 翻譯面對面對話：https://support.apple.com/guide/airpods/dev9c215ca94

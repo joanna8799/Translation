@@ -6,7 +6,7 @@
 目前內容：
 - 漫畫翻譯 pipeline 示範（demo/manga-pipeline/，已在本環境跑通，有結果圖）。
 - 評估文件（docs/）。
-- iOS 即時模式技術驗證專案（ios-spike/，Phase 0b）與旅行即時口譯驗證專案（ios-talk-spike/，見 docs/09）。兩個 iOS 專案由 GitHub Actions 在 macOS runner 上用 Xcode 26 編譯（`.github/workflows/ios-build.yml`），編譯通過，尚未實機驗證。TalkSpike 的未簽章 .ipa 在 release `talkspike-latest`。
+- iOS 即時模式技術驗證專案（ios-spike/，Phase 0b）與旅行即時口譯驗證專案（ios-talk-spike/，見 docs/07）。兩個 iOS 專案由 GitHub Actions 在 macOS runner 上用 Xcode 26 編譯（`.github/workflows/ios-build.yml`），編譯通過，尚未實機驗證。TalkSpike 的未簽章 .ipa 在 release `talkspike-latest`。
 - Android 無障礙讀字驗證專案（android-spike/，Phase 0c）。GitHub Actions 在 Ubuntu runner 上用正規 SDK 編譯（`.github/workflows/android-build.yml`），debug APK 在 release `readtrans-spike-latest`；本機無 SDK 時的替代流程 `android-spike/tools/build-without-sdk.sh` 也能組出同一個 APK（`android-spike/dist/`）。
 
 2026-10-20 依重申的五項需求重新盤點，結果在 [docs/08-requirements-inventory.md](docs/08-requirements-inventory.md)：需求 1、3、4 有缺口，其中「平台 app 鎖定的小說」應以 Android 無障礙讀字為主路徑，iOS 截圖並非在所有 app 都可用。建置計畫在 [docs/09-build-plan.md](docs/09-build-plan.md)。
