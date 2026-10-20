@@ -3,7 +3,7 @@
 目標：做一款像 EasyComix 那樣「在你原本的閱讀環境裡就地翻譯漫畫與小說」的產品，
 但採用沈浸式翻譯的鋪法：所有瀏覽器都能裝、手機上任何 app 內的內容都能翻。
 
-目前內容：評估文件（docs/）、iOS 即時模式技術驗證專案（ios-spike/，Phase 0b，沒有 Xcode 無法編譯）、Android 無障礙讀字驗證專案（android-spike/，Phase 0c，**已編譯並組成可安裝的 APK**：android-spike/dist/readtrans-spike-debug.apk）。
+目前內容：漫畫翻譯 pipeline 示範（demo/manga-pipeline/，已在本環境跑通，有結果圖）、評估文件（docs/）、iOS 即時模式技術驗證專案（ios-spike/，Phase 0b，沒有 Xcode 無法編譯）、Android 無障礙讀字驗證專案（android-spike/，Phase 0c，**已編譯並組成可安裝的 APK**：android-spike/dist/readtrans-spike-debug.apk）。
 
 2026-10-20 依重申的五項需求重新盤點，結果在 [docs/07-requirements-inventory.md](docs/07-requirements-inventory.md)：需求 1、3、4 有缺口，其中「平台 app 鎖定的小說」應以 Android 無障礙讀字為主路徑，iOS 截圖並非在所有 app 都可用。
 
@@ -20,6 +20,7 @@
 | [docs/07-requirements-inventory.md](docs/07-requirements-inventory.md) | 需求對照盤點：五項需求的覆蓋程度、統一分層表、平台 app 鎖定小說的四條路徑與驗證清單、沉浸式翻譯小說功能對照、路線圖調整、待決策 |
 | [docs/08-build-plan.md](docs/08-build-plan.md) | 建置計畫：iOS 截圖與「讀螢幕」會不會被內容保護擋的精確答案、各平台實測回報、用 Shinkansen 補網頁與檔案那一半、Android 與 iOS 到類別與 API 的設計、proxy 端點、六週交付表、本週實機要做的事 |
 | [docs/references.md](docs/references.md) | 所有參考來源 |
+| [demo/manga-pipeline/README.md](demo/manga-pipeline/README.md) | **已跑通的漫畫翻譯 pipeline**：測試頁 → 氣泡偵測 → OCR → LLM 翻譯 → 擦字排版，結果圖在 demo/manga-pipeline/results/ |
 | [android-spike/README.md](android-spike/README.md) | Android 無障礙讀字驗證專案：AccessibilityService 讀目標 app 文字節點、ML Kit 端側翻譯、底部面板、FLAG_SECURE 判定流程、結果記錄表 |
 | [ios-spike/README.md](ios-spike/README.md) | iOS 即時模式技術驗證專案：廣播擴充加 PiP 的最小實作、五項驗證的操作步驟、結果記錄表 |
 

@@ -1,0 +1,89 @@
+{
+ "page": "sample_ja",
+ "source_lang": "ja",
+ "target_lang": "zh-TW",
+ "image_size": [
+  1000,
+  1450
+ ],
+ "bubbles": [
+  {
+   "id": 0,
+   "box": [
+    759,
+    69,
+    173,
+    329
+   ],
+   "text": "いららっしゃい!久しぶりじゃないか",
+   "vertical": true,
+   "ocr_ms": 251,
+   "confidence": 66
+  },
+  {
+   "id": 1,
+   "box": [
+    325,
+    69,
+    137,
+    329
+   ],
+   "text": "この街に来るのは三年ぶりだな",
+   "vertical": true,
+   "ocr_ms": 117,
+   "confidence": 91
+  },
+  {
+   "id": 2,
+   "box": [
+    539,
+    349,
+    137,
+    329
+   ],
+   "text": "覚えててくれたんですか",
+   "vertical": true,
+   "ocr_ms": 86,
+   "confidence": 96
+  },
+  {
+   "id": 3,
+   "box": [
+    69,
+    349,
+    137,
+    329
+   ],
+   "text": "あの店、まだあるかな",
+   "vertical": true,
+   "ocr_ms": 94,
+   "confidence": 88
+  },
+  {
+   "id": 4,
+   "box": [
+    251,
+    764,
+    211,
+    329
+   ],
+   "text": "当たり前だ。毎日ここで宿題してたやつを忘れるわけがない",
+   "vertical": true,
+   "ocr_ms": 225,
+   "confidence": 87
+  },
+  {
+   "id": 5,
+   "box": [
+    686,
+    942,
+    99,
+    297
+   ],
+   "text": "……ただいま",
+   "vertical": true,
+   "ocr_ms": 52,
+   "confidence": 92
+  }
+ ]
+}

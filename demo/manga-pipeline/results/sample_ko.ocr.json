@@ -1,0 +1,76 @@
+{
+ "page": "sample_ko",
+ "source_lang": "ko",
+ "target_lang": "zh-TW",
+ "image_size": [
+  800,
+  2000
+ ],
+ "bubbles": [
+  {
+   "id": 0,
+   "box": [
+    72,
+    124,
+    297,
+    113
+   ],
+   "text": "오늘도 야근이야?",
+   "vertical": false,
+   "ocr_ms": 113,
+   "confidence": 93
+  },
+  {
+   "id": 1,
+   "box": [
+    394,
+    484,
+    373,
+    113
+   ],
+   "text": "응, 이번 주만 참으면 돼.",
+   "vertical": false,
+   "ocr_ms": 59,
+   "confidence": 92
+  },
+  {
+   "id": 2,
+   "box": [
+    34,
+    844,
+    387,
+    113
+   ],
+   "text": "그 말 지난주에도 했잖아.",
+   "vertical": false,
+   "ocr_ms": 74,
+   "confidence": 93
+  },
+  {
+   "id": 3,
+   "box": [
+    282,
+    1204,
+    485,
+    113
+   ],
+   "text": "이번엔 진짜아. 끝나면 밥 사줄게.",
+   "vertical": false,
+   "ocr_ms": 95,
+   "confidence": 91
+  },
+  {
+   "id": 4,
+   "box": [
+    100,
+    1564,
+    241,
+    113
+   ],
+   "text": "약속한 거다?",
+   "vertical": false,
+   "ocr_ms": 35,
+   "confidence": 94
+  }
+ ]
+}

@@ -180,6 +180,10 @@ KV
 
 免費層完全不碰這個 proxy，所以 Workers 付費方案 US$5/月加 KV 就夠撐到幾千個 Pro。
 
+## 5b. Phase 0 已經跑通
+
+[demo/manga-pipeline/](../demo/manga-pipeline/README.md) 在這個環境裡完整跑了一遍：自製測試頁 → 像素法氣泡偵測（11/11）→ Tesseract OCR（11 句全部可讀，2 個錯字）→ LLM 翻譯（錯字被上下文修正）→ 擦字與直書／橫書排版。資料格式就是 §5 的 bubbles JSON。產品版只換三個零件：偵測模型、OCR 模型、翻譯 proxy，介面不變。
+
 ## 6. 六週計畫，每週交付物
 
 | 週 | 交付 | 驗收 |
