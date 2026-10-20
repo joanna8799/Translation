@@ -1,0 +1,69 @@
+# 把 extension/ 用 Apple 的轉換工具包成 iOS Safari 擴充 app，產出未簽章 .ipa（AltStore 用免費 Apple ID 安裝）。
+#   https://github.com/joanna8799/Translation/releases/download/safari-latest/ReadTrans-Safari-unsigned.ipa
+name: Safari extension
+
+on:
+  push:
+    paths:
+      - "extension/**"
+      - ".github/workflows/safari-extension.yml"
+      - "!**/*.md"
+  workflow_dispatch:
+
+jobs:
+  safari:
+    runs-on: macos-26
+    permissions:
+      contents: write
+    concurrency:
+      group: safari-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.4.1.app && xcodebuild -version
+      - name: Convert web extension to Safari app
+        run: |
+          rm -rf build/safari && mkdir -p build
+          # Safari 不吃 offscreen 權限，但多餘的權限只會被忽略；背景頁用 manifest 的 background.scripts。
+          xcrun safari-web-extension-converter extension \
+            --project-location build/safari --app-name ReadTrans --bundle-identifier com.example.readtrans \
+            --ios-only --no-open --copy-resources --force 2>&1 | tee convert.log
+          ls build/safari
+      - name: Build (unsigned, device)
+        run: |
+          set -o pipefail
+          PROJ=$(find build/safari -name '*.xcodeproj' -maxdepth 2 | head -1); echo "project=$PROJ"
+          xcodebuild -list -project "$PROJ"
+          SCHEME=$(xcodebuild -list -project "$PROJ" 2>/dev/null | awk '/Schemes:/{f=1;next} f&&NF{print $0; exit}' | sed 's/^ *//')
+          echo "scheme=$SCHEME"
+          xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Release -destination "generic/platform=iOS" \
+            -derivedDataPath build/dd CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" \
+            build 2>&1 | tee build.log | grep -E "error:|BUILD|\*\* " || true
+          grep -q "BUILD SUCCEEDED" build.log
+          APP=$(find build/dd/Build/Products -name 'ReadTrans.app' -maxdepth 2 | head -1); echo "app=$APP"
+          rm -rf Payload && mkdir Payload && cp -R "$APP" Payload/ && zip -qr ReadTrans-Safari-unsigned.ipa Payload && ls -la ReadTrans-Safari-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: safari-extension
+          path: |
+            convert.log
+            build.log
+            ReadTrans-Safari-unsigned.ipa
+      - name: Publish to rolling pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="ReadTrans Safari 擴充 0.1.${{ github.run_number }}（未簽章）"
+          NOTES="自動產出，commit ${GITHUB_SHA:0:7}。AltStore 以免費 Apple ID 安裝後，到 設定 → Safari → 延伸功能 開啟 ReadTrans。步驟見 extension/README.md。"
+          for attempt in 1 2 3; do
+            if gh release view safari-latest >/dev/null 2>&1; then
+              gh release upload safari-latest ReadTrans-Safari-unsigned.ipa --clobber \
+                && gh release edit safari-latest --prerelease --title "$TITLE" --notes "$NOTES" \
+                && git tag -f safari-latest "$GITHUB_SHA" && git push -f origin safari-latest && break
+            else
+              gh release create safari-latest ReadTrans-Safari-unsigned.ipa --target "$GITHUB_SHA" --prerelease --title "$TITLE" --notes "$NOTES" && break
+            fi
+            sleep 15; [ "$attempt" = 3 ] && exit 1
+          done

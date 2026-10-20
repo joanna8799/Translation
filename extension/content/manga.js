@@ -50,7 +50,7 @@
       const items = det.boxes.map((b, i) => ({ box: b, text: (o.results[i] || {}).text || '', translated: '' }));
       const withText = items.filter((it) => it.text.length >= 1);
       if (!withText.length) { img.dataset.rtState = 'none'; return; }
-      const t = await RT.send({ type: 'rt:translate', texts: withText.map((it) => it.text), kind: 'manga' });
+      const t = await RT.send({ type: 'rt:translate', texts: withText.map((it) => it.text), kind: 'manga', host: location.hostname });
       if (!t.ok) throw new Error(t.error);
       withText.forEach((it, i) => { it.translated = t.translations[i] || ''; });
       const canvas = RT.renderTranslated(src, src.width, src.height, det, items, mode === 'ja_vert');

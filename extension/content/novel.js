@@ -52,7 +52,7 @@
         const batch = []; let chars = 0;
         while (state.queue.length && batch.length < 25 && chars < 3000) { const it = state.queue.shift(); batch.push(it); chars += it.text.length; }
         batch.forEach((it) => { it.el.dataset.rtDone = '1'; });
-        const r = await RT.send({ type: 'rt:translate', texts: batch.map((b) => b.text), kind: 'novel' });
+        const r = await RT.send({ type: 'rt:translate', texts: batch.map((b) => b.text), kind: 'novel', host: location.hostname });
         if (!r.ok) { RT.log('翻譯失敗', r.error); batch.forEach((it) => { inject(it.el, `[翻譯失敗：${r.error}]`); }); continue; }
         batch.forEach((it, i) => { inject(it.el, r.translations[i]); state.done++; });
         document.dispatchEvent(new CustomEvent('rt:progress'));

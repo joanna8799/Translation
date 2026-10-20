@@ -16,9 +16,21 @@
 
 **Android**
 
-Chrome 不能裝擴充。用 Kiwi Browser 或 Microsoft Edge（Android 版有擴充功能）：把 `extension/` 打包成 zip 傳到手機，在 Kiwi 的 `chrome://extensions` 用「+(from .zip)」載入；Edge Android 在 設定 → 擴充功能 載入。
+Chrome 不能裝擴充。Kiwi Browser 已於 2025 年 1 月停止維護；Edge Android 只能裝 Edge 商店裡的擴充，不能載入自己的 zip。所以 Android 上有三條路：
 
-**iPhone**：Safari 擴充要用 Xcode 包成 app，排在後面做。
+1. 送上 Edge 商店或 Firefox 的 AMO（都免費，要審核）。這份擴充已經是 Chrome、Firefox 雙相容的寫法（manifest 同時有 `service_worker` 與 `scripts`，OCR 在 Firefox 走背景頁）。
+2. 我們自己的 Android app 內建瀏覽器，把這套內容腳本注入 WebView，跟沉浸式翻譯的 Android app 同一個做法。這個 app 本來就要做（無障礙讀字那個），之後合併。
+3. 手機上的 Ridi、Kakao Page、Naver Series app 本來就不是擴充能碰的，走 android-spike 的無障礙服務。
+
+**iPhone Safari**
+
+CI 用 Apple 的 `safari-web-extension-converter` 把這份擴充包成 app（`.github/workflows/safari-extension.yml`），產出未簽章 .ipa，AltStore 以免費 Apple ID 安裝，再到 設定 → Safari → 延伸功能 開啟：
+
+```
+https://github.com/joanna8799/Translation/releases/download/safari-latest/ReadTrans-Safari-unsigned.ipa
+```
+
+Safari 沒有 offscreen 文件，OCR 改在背景頁跑（背景程式自動判斷）。還沒在實機驗證過。
 
 ## 翻譯引擎
 
@@ -29,6 +41,19 @@ Chrome 不能裝擴充。用 Kiwi Browser 或 Microsoft Edge（Android 版有擴
 | OpenAI 相容端點 | 端點加 key | 依模型 |
 
 在圖示 → 設定 裡切換。這三個就是 docs/03 說的 L0、L1、BYOK 三層；之後我們自己的 proxy 也走 OpenAI 相容端點這一格。
+
+## 給語言模型的調教（Gemini 與 OpenAI 相容端點才有）
+
+EasyComix 的「故事背景／上下文翻譯」是 Pro 功能，這裡直接內建：
+
+- 漫畫與小說用不同的提示：漫畫要對白短、塞得進對話框、狀聲詞與情緒照漫畫寫法；小說要文學語氣、敘述與對白分明、敬語稱呼依關係。
+- OCR 錯字、直書斷行的空格換行，提示裡要求依上下文還原再翻。
+- 詞彙表（原文=譯名）強制採用。
+- 作品背景：設定裡填作品名、人物關係、稱呼習慣，每次請求都帶。
+- 前文對照：每個網站最近翻過的 40 句存在瀏覽器裡，每次帶最後 20 句進提示，人名與語氣才會前後一致，換章也不會變譯法。
+- 只回 JSON，不要解釋，省 output token。
+
+Google 免費端點是純機器翻譯，吃不到這些。
 
 ## 漫畫的限制（這一版）
 

@@ -180,6 +180,12 @@ KV
 
 免費層完全不碰這個 proxy，所以 Workers 付費方案 US$5/月加 KV 就夠撐到幾千個 Pro。
 
+## 5a. 電腦上的閱讀器 app（Ridi PC 閱讀器、Kindle、BookWalker 桌面版）
+
+網頁版走擴充，但平台的桌面閱讀器 app 跟手機 app 一樣碰不到。桌面有跟 Android 無障礙服務對應的東西：Windows 的 UI Automation、macOS 的 Accessibility API，可以讀別的視窗的文字節點，Electron 與 Chromium 做的閱讀器（Ridi PC 閱讀器就是）通常會暴露無障礙樹。螢幕擷取被 DRM 擋住時，這條路可能還通，跟 Android 的狀況一樣。
+
+所以桌面要多一個小程式：讀前景視窗的無障礙樹（小說）或擷取視窗畫面做 OCR（漫畫，DRM 擋得住的就不行），譯文用置頂的半透明視窗疊上去。做法與 Android app 一對一對應，排在 Android app 之後；之前「PC 不做桌面 app」的判斷要改。先驗證的清單：Ridi PC 閱讀器、Kindle for PC、BookWalker、Kakao Page 網頁在 Electron 殼裡的版本，各看一次 UI Automation 讀不讀得到正文。
+
 ## 5b. Phase 0 已經跑通
 
 [demo/manga-pipeline/](../demo/manga-pipeline/README.md) 在這個環境裡完整跑了一遍：自製測試頁 → 像素法氣泡偵測（11/11）→ Tesseract OCR（11 句全部可讀，2 個錯字）→ LLM 翻譯（錯字被上下文修正）→ 擦字與直書／橫書排版。資料格式就是 §5 的 bubbles JSON。產品版只換三個零件：偵測模型、OCR 模型、翻譯 proxy，介面不變。
