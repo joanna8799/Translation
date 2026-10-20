@@ -28,6 +28,24 @@ LiveSpike（主 app）                     LiveSpikeBroadcast（廣播擴充，5
   兩邊各寫自己的 metrics_*.jsonl
 ```
 
+## 不用付費帳號也能裝：AltStore
+
+CI 每次推送會產出未簽章的 .ipa，固定網址：
+
+```
+https://github.com/joanna8799/Translation/releases/download/livespike-latest/LiveSpike-unsigned.ipa
+```
+
+用免費 Apple ID 經 AltStore 安裝（電腦端設定見 [ios-talk-spike/INSTALL.md](../ios-talk-spike/INSTALL.md) 的 C 路線）：在 iPhone 的 Safari 下載這個 .ipa，到「檔案」app 點它 → 分享 → AltStore，AltStore 會用你的 Apple ID 簽章並安裝。
+
+這個 app 跟 TalkSpike 不同，有廣播擴充與 App Group，免費帳號仍然裝得了，但有三件事要知道：
+
+- AltStore 會把 App Group 改名（加上你的 Team ID）。app 在執行期讀 Info.plist 的 `ALTAppGroups` 拿實際 ID，所以不用改程式。
+- 免費帳號一週只能註冊 10 個 App ID，這個 app 用掉 2 個（主 app 與擴充）；同時最多裝 3 個側載 app。
+- 7 天到期，AltStore 在同一個 Wi-Fi 下會自動續簽。
+
+真正需要付費帳號的只有兩件事：上架 App Store、以及 TestFlight 發測試版給別人。驗證階段都不需要。
+
 ## 設定步驟
 
 1. 安裝 XcodeGen：`brew install xcodegen`

@@ -184,6 +184,22 @@ KV
 
 [demo/manga-pipeline/](../demo/manga-pipeline/README.md) 在這個環境裡完整跑了一遍：自製測試頁 → 像素法氣泡偵測（11/11）→ Tesseract OCR（11 句全部可讀，2 個錯字）→ LLM 翻譯（錯字被上下文修正）→ 擦字與直書／橫書排版。資料格式就是 §5 的 bubbles JSON。產品版只換三個零件：偵測模型、OCR 模型、翻譯 proxy，介面不變。
 
+## 5c. 不付費的路線：哪些真的要錢、哪些不用
+
+| 項目 | 要不要付費 | 說明 |
+|---|---|---|
+| Android 驗證與測試 | 不用 | APK 直接側載，CI 已產出 |
+| Android 上架 Google Play | US$25 一次 | 之後再說，測試期不需要 |
+| 瀏覽器與檔案（Shinkansen） | 不用 | 它已上架，我們不碰 |
+| iOS 驗證專案裝到自己手機 | 不用 | TalkSpike 與 LiveSpike 都走 AltStore 加免費 Apple ID，7 天續簽、最多 3 個 app。LiveSpike 的 App Group 由 CI 用 ad-hoc 簽章嵌入，app 執行期讀 `ALTAppGroups` |
+| iOS 給別人測（TestFlight） | US$99/年 | 之後再說 |
+| iOS 上架 App Store | US$99/年 | 之後再說 |
+| 雲端 proxy（Cloudflare Workers） | 免費額度先用 | 每日 10 萬次請求夠 MVP，付費方案 US$5/月 |
+| LLM API | 用量計費 | 驗證期間可以先用 BYOK，或 Gemini 免費層 |
+| 端側 OCR 與翻譯（ML Kit、Vision、Apple Translation） | 不用 | 這是整個設計的前提 |
+
+結論：到 Phase 5 之前一毛錢都不用付。第一筆必要支出是上架時的 Apple US$99，可以等產品驗證完再決定。
+
 ## 6. 六週計畫，每週交付物
 
 | 週 | 交付 | 驗收 |
