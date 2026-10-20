@@ -12,16 +12,21 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import android.app.Activity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
  * 驗證用控制台：開無障礙設定、勾目標 app、看最新一輪、匯出紀錄。
- * 全部用程式碼建 view，避免多一層 layout 資源出錯。
+ * 全部用程式碼建 view，不依賴 androidx，讓這個專案只靠 android.jar 與 kotlinx-coroutines 就能編譯。
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
+
+    private val uiScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private lateinit var status: TextView
     private lateinit var latest: TextView
@@ -64,16 +69,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         col.addView(Button(this).apply {
-            text = "預先下載翻譯模型（ko、ja）"
+            text = "測試翻譯（韓文一句）"
             setOnClickListener {
-                lifecycleScope.launch {
-                    try {
-                        L0Translator.ensureModel("ko")
-                        L0Translator.ensureModel("ja")
-                        toast("模型就緒")
-                    } catch (e: Exception) {
-                        toast("下載失敗：${e.message}")
-                    }
+                uiScope.launch {
+                    val (out, _) = L0Translator.translateAll("ko", listOf("오늘은 날씨가 좋다."))
+                    toast(out.first())
                 }
             }
         })
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         log = TextView(this).apply { textSize = 11f; setTextIsSelectable(true) }
         col.addView(log)
 
-        lifecycleScope.launch {
+        uiScope.launch {
             TextBus.latest.collectLatest { snap ->
                 latest.text = if (snap == null) "尚無資料。開啟服務後到目標 app 的小說頁停 2 秒。" else buildString {
                     appendLine("package：${snap.pkg}")
@@ -115,6 +115,11 @@ class MainActivity : AppCompatActivity() {
                 refreshLog()
             }
         }
+    }
+
+    override fun onDestroy() {
+        uiScope.cancel()
+        super.onDestroy()
     }
 
     override fun onResume() {

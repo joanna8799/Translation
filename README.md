@@ -3,7 +3,7 @@
 目標：做一款像 EasyComix 那樣「在你原本的閱讀環境裡就地翻譯漫畫與小說」的產品，
 但採用沈浸式翻譯的鋪法：所有瀏覽器都能裝、手機上任何 app 內的內容都能翻。
 
-目前內容：評估文件（docs/）、iOS 即時模式技術驗證專案（ios-spike/，Phase 0b）、Android 無障礙讀字驗證專案（android-spike/，Phase 0c）。兩個驗證專案都在沒有 SDK 的環境寫成，尚未編譯。
+目前內容：評估文件（docs/）、iOS 即時模式技術驗證專案（ios-spike/，Phase 0b，沒有 Xcode 無法編譯）、Android 無障礙讀字驗證專案（android-spike/，Phase 0c，**已編譯並組成可安裝的 APK**：android-spike/dist/readtrans-spike-debug.apk）。
 
 2026-10-20 依重申的五項需求重新盤點，結果在 [docs/07-requirements-inventory.md](docs/07-requirements-inventory.md)：需求 1、3、4 有缺口，其中「平台 app 鎖定的小說」應以 Android 無障礙讀字為主路徑，iOS 截圖並非在所有 app 都可用。
 

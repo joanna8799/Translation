@@ -5,7 +5,7 @@
 > 2. Shinkansen（https://github.com/jimmysu0309/shinkansen）能替我們省掉什麼、不能替我們做什麼。
 > 3. 接下來六週每一週要交出什麼、用什麼 API、哪個檔案。
 >
-> 程式碼：[android-spike/](../android-spike/README.md)（Android 無障礙讀字驗證，對應 Phase 0c）。
+> 程式碼：[android-spike/](../android-spike/README.md)（Android 無障礙讀字驗證，對應 Phase 0c）。已編譯並組成可安裝的 APK：[android-spike/dist/readtrans-spike-debug.apk](../android-spike/dist/readtrans-spike-debug.apk)。
 
 ## 0. 先回答你的兩個問題
 
@@ -198,7 +198,7 @@ KV
 
 Android（任何一台 Android 10 以上的手機）：
 
-1. 把 android-spike 用 Android Studio 開起來，改 `applicationId`，裝到手機。
+1. 直接 `adb install -r android-spike/dist/readtrans-spike-debug.apk`，或把 APK 傳到手機安裝。不用 Android Studio。
 2. 設定 → 無障礙 → ReadTrans Spike → 開。
 3. 開 Kakao Page，進一本「專用行動閱讀器」的小說，捲兩頁。回 Spike app 看「最新一輪」有沒有文字、幾個節點。
 4. 在同一頁按截圖。黑或跳訊息就是 FLAG_SECURE，記下來。

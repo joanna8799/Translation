@@ -1,21 +1,23 @@
 package dev.readtrans.spike
 
 import android.util.LruCache
-import com.google.mlkit.common.model.DownloadConditions
-import com.google.mlkit.nl.translate.TranslateLanguage
-import com.google.mlkit.nl.translate.Translation
-import com.google.mlkit.nl.translate.Translator
-import com.google.mlkit.nl.translate.TranslatorOptions
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLEncoder
 
 /**
- * L0 端側翻譯：ML Kit Translation。免費、離線、第一次要下載模型（每個語言對約 30 MB）。
- * 目標語言 ML Kit 只有簡體中文，產品版再接 OpenCC 轉繁體。
+ * 驗證用的 L0 翻譯。
+ *
+ * 產品版走 ML Kit Translation（端側、免費、離線），但 ML Kit 只在 Google Maven 上，
+ * 這份驗證專案為了能在沒有 Google Maven 的環境編譯，改用 Google 翻譯的公開 gtx 端點
+ * （Shinkansen 的「Google Translate」引擎用的也是它）。不需要 key，直接出繁體中文。
+ * 它只是驗證「讀到的文字能不能翻」的替身，不要拿去上線。
  */
 object L0Translator {
     private val cache = LruCache<String, String>(4000)
-    private val clients = HashMap<String, Translator>()
-    private val ready = HashSet<String>()
 
     /** 用字元範圍判斷來源語言。韓文字母佔三成以上判 ko；有假名判 ja；否則 null。 */
     fun detect(text: String): String? {
@@ -30,48 +32,54 @@ object L0Translator {
             }
         }
         if (letters == 0) return null
-        if (hangul * 10 >= letters * 3) return TranslateLanguage.KOREAN
-        if (kana > 0) return TranslateLanguage.JAPANESE
+        if (hangul * 10 >= letters * 3) return "ko"
+        if (kana > 0) return "ja"
         return null
     }
 
-    private fun client(src: String): Translator = clients.getOrPut(src) {
-        Translation.getClient(
-            TranslatorOptions.Builder()
-                .setSourceLanguage(src)
-                .setTargetLanguage(TranslateLanguage.CHINESE)
-                .build()
-        )
-    }
-
-    suspend fun ensureModel(src: String) {
-        if (src in ready) return
-        client(src).downloadModelIfNeeded(DownloadConditions.Builder().build()).await()
-        ready.add(src)
-    }
-
     /** 回傳 (譯文列表, 快取命中數)。 */
-    suspend fun translateAll(src: String, texts: List<String>): Pair<List<String>, Int> {
-        ensureModel(src)
-        val t = client(src)
-        var hits = 0
-        val out = ArrayList<String>(texts.size)
-        for (s in texts) {
-            val key = "$src|$s"
-            val cached = cache.get(key)
-            if (cached != null) {
-                hits++
-                out.add(cached)
-                continue
+    suspend fun translateAll(src: String, texts: List<String>): Pair<List<String>, Int> =
+        withContext(Dispatchers.IO) {
+            var hits = 0
+            val out = ArrayList<String>(texts.size)
+            for (s in texts) {
+                val key = "$src|$s"
+                val cached = cache.get(key)
+                if (cached != null) {
+                    hits++
+                    out.add(cached)
+                    continue
+                }
+                val r = try {
+                    gtx(src, "zh-TW", s)
+                } catch (e: Exception) {
+                    "[翻譯失敗 ${e.javaClass.simpleName}]"
+                }
+                cache.put(key, r)
+                out.add(r)
             }
-            val r = try {
-                t.translate(s).await()
-            } catch (e: Exception) {
-                "[翻譯失敗 ${e.javaClass.simpleName}]"
-            }
-            cache.put(key, r)
-            out.add(r)
+            out to hits
         }
-        return out to hits
+
+    private fun gtx(src: String, tgt: String, text: String): String {
+        val q = URLEncoder.encode(text, "UTF-8")
+        val url = URL("https://translate.googleapis.com/translate_a/single?client=gtx&sl=$src&tl=$tgt&dt=t&q=$q")
+        val conn = url.openConnection() as HttpURLConnection
+        conn.connectTimeout = 8000
+        conn.readTimeout = 8000
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0")
+        try {
+            val body = conn.inputStream.bufferedReader().readText()
+            // 格式：[[["譯文","原文",...],["譯文2","原文2",...]], null, "ko", ...]
+            val segments = JSONArray(body).getJSONArray(0)
+            val sb = StringBuilder()
+            for (i in 0 until segments.length()) {
+                val seg = segments.optJSONArray(i) ?: continue
+                sb.append(seg.optString(0))
+            }
+            return sb.toString()
+        } finally {
+            conn.disconnect()
+        }
     }
 }

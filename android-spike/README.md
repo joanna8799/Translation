@@ -6,9 +6,25 @@
 
 讀得到，Android 小說功能就走這條主路徑，不怕內容保護、不用 OCR、不跳系統對話框。讀不到，才退到螢幕擷取加 OCR；再被 FLAG_SECURE 擋，這個 app 在 Android 上就只能引導去網頁版。
 
-## 這份程式碼的狀態
+## 這份程式碼的狀態：已編譯、已組成可安裝的 APK
 
-在沒有 Android SDK 的環境裡寫的（dl.google.com 被網路白名單擋住），沒有編譯過。API 用法都對照過 Android 文件，第一次用 Android Studio 開預期會有幾處要修，應該是 import 或簽章的小差異，不是架構問題。修完請把 diff 丟回來。
+[dist/readtrans-spike-debug.apk](dist/readtrans-spike-debug.apk)（約 1 MB，debug 自簽金鑰，minSdk 26、targetSdk 35）可以直接裝：
+
+```
+adb install -r android-spike/dist/readtrans-spike-debug.apk
+```
+
+或把檔案傳到手機點開安裝（要允許安裝未知來源 app）。Android 13 以上側載的 app 要在「應用程式資訊 → 右上角選單 → 允許受限設定」之後，才能在無障礙設定裡開啟它。
+
+這個環境連不上 dl.google.com，裝不了 Android SDK，所以 APK 是用 [tools/build-without-sdk.sh](tools/build-without-sdk.sh) 組出來的：android.jar 來自 GitHub 的 Sable/android-platforms（API 35），d8 來自 r8-releases 的 r8lib.jar，aapt2 來自 npm 套件 aaptjs3 內附的 Linux 執行檔，簽章用 npm 套件 apk_sign_ts（v1 加 v2 加 v3，含 zipalign）。Kotlin 編譯零錯誤零警告。已核對過：簽章區塊存在、resources.arsc 未壓縮且 4 byte 對齊、manifest 與無障礙設定檔解析正確、`canRetrieveWindowContent=true`。
+
+為了只靠 Maven Central 就能編譯，這份驗證專案刻意不用 androidx 與 ML Kit：
+
+- `MainActivity` 繼承框架的 `Activity`，不用 AppCompat。
+- `L0Translator` 用 Google 翻譯公開的 gtx 端點（Shinkansen 的「Google Translate」引擎用的同一個），不需要 key，直接出繁體中文。產品版換成 ML Kit 端側翻譯，介面不變。
+- 真正要驗的東西（AccessibilityService 讀字、`TYPE_ACCESSIBILITY_OVERLAY` 面板、去抖去重）完全不受這兩個替換影響。
+
+在 Android Studio 用 `build.gradle.kts` 開也可以，依賴只有 kotlinx-coroutines-android。
 
 ## 架構
 
@@ -33,7 +49,7 @@ MainActivity：開無障礙設定、勾目標 app、看最新一輪節點、匯�
 
 1. Android Studio 開 `android-spike/`，等 Gradle 同步。
 2. 改 `app/build.gradle.kts` 的 `applicationId`（預設 `dev.readtrans.spike`，可以不改）。
-3. 接實機（Android 10 以上），Run。
+3. 接實機（Android 10 以上），Run。或直接 `adb install -r dist/readtrans-spike-debug.apk`，跳過 1 到 3。
 4. app 裡按「開啟無障礙設定」，找到 ReadTrans Spike，開啟。Android 13 以上從 APK 側載的 app 要先在「應用程式資訊」裡允許受限設定，Play 內部測試軌道發的不用。
 5. 回 app，勾選要測的目標 app。package 名稱若不對，用 `adb shell pm list packages | grep -i <關鍵字>` 查，在「自訂 package」欄位補。
 
@@ -59,7 +75,7 @@ MainActivity：開無障礙設定、勾目標 app、看最新一輪節點、匯�
 
 ## 已知的簡化
 
-- ML Kit 翻譯的中文目標只有簡體，面板顯示簡體。產品版會接 OpenCC 轉繁體，這裡不影響驗證目的。
+- 翻譯走 Google 翻譯 gtx 公開端點，需要網路；它只是驗證用替身，產品版換 ML Kit 端側。
 - 語言判斷用字元範圍：韓文字母佔三成以上判 ko，有平假名或片假名判 ja，否則跳過不翻。
 - 面板是唯讀的、觸控穿透，不能拖動。就地雙語模式不在這次範圍。
 - 只處理 `rootInActiveWindow`，不處理分割畫面或多視窗。
