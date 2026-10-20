@@ -34,6 +34,20 @@ jobs:
         run: |
           set -o pipefail
           PROJ=$(find build/safari -name '*.xcodeproj' -maxdepth 2 | head -1); echo "project=$PROJ"
+          # 轉換工具會把擴充的 bundle ID 取成 manifest 裡給 Firefox 的 gecko id，
+          # 跟母 app 的 com.example.readtrans 沒有前綴關係，Xcode 會拒絕嵌入。這裡改回 com.example.readtrans.extension。
+          python3 - "$PROJ/project.pbxproj" <<'PY'
+          import re, sys
+          path = sys.argv[1]; s = open(path).read()
+          def fix(m):
+              v = m.group(1).strip('"')
+              if v == 'com.example.readtrans' or v.startswith('com.example.readtrans.'): return m.group(0)
+              print('rewrite bundle id', v, '-> com.example.readtrans.extension')
+              return 'PRODUCT_BUNDLE_IDENTIFIER = com.example.readtrans.extension;'
+          s2 = re.sub(r'PRODUCT_BUNDLE_IDENTIFIER = ("?[^";]+"?);', fix, s)
+          open(path, 'w').write(s2)
+          PY
+          grep -n PRODUCT_BUNDLE_IDENTIFIER "$PROJ/project.pbxproj" | head
           xcodebuild -list -project "$PROJ"
           SCHEME=$(xcodebuild -list -project "$PROJ" 2>/dev/null | awk '/Schemes:/{f=1;next} f&&NF{print $0; exit}' | sed 's/^ *//')
           echo "scheme=$SCHEME"
